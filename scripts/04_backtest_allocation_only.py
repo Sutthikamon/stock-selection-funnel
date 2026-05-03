@@ -1,7 +1,7 @@
 # %% [markdown]
 # # 04 Backtest / Evaluation
 #
-# This notebook-style script tests the portfolio allocation models out of sample.
+# This notebook-style script tests the portfolio allocation methods out of sample.
 #
 # Important scope:
 # - This is an allocation-only backtest.
@@ -9,6 +9,8 @@
 # - At every rebalance date, weights are computed only from past returns available at that date.
 # - Realized performance is measured only with actual historical returns after the rebalance date.
 # - Bootstrap and Monte Carlo scenarios are used only inside the CVaR optimizers, not to simulate performance.
+# - It compares allocation methods only; it does not test whether the fixed Step 02 selected-stock list
+#   could have been known historically without look-ahead.
 
 # %%
 from pathlib import Path
@@ -778,7 +780,7 @@ def short_method_name(method):
         "equal": "Equal",
         "inverse_volatility": "Inv Vol",
         "risk_parity": "Risk Parity",
-        "markowitz_best_sharpe_default": "Markowitz",
+        "markowitz_best_sharpe_default": "Markowitz-style Mean-Volatility",
         "cvar_bootstrap": "CVaR Boot",
         "cvar_montecarlo": "CVaR MC",
         BENCHMARK_NAME: "S&P 500",

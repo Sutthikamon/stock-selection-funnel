@@ -4,7 +4,7 @@
 # This notebook-style script backtests the full workflow:
 #
 # 1. Use only data available up to each rebalance date.
-# 2. Re-run stock selection with Spearman correlation, hierarchical clustering, and Sharpe ranking.
+# 2. Re-run stock selection with Spearman correlation, hierarchical clustering, and historical Sharpe ranking.
 # 3. Allocate the newly selected stocks with the portfolio models from step 03/04.
 # 4. Hold the portfolio through the next month and measure realized returns.
 #
@@ -12,6 +12,7 @@
 # - This removes the step-02 look-ahead leakage from using one fixed 25-stock list.
 # - It still uses the current S&P 500 constituent universe from the project data, so it is not a true
 #   point-in-time S&P 500 constituent backtest.
+# - Historical Sharpe is used as a backward-looking ranking heuristic, not as a predictive model.
 
 # %%
 from pathlib import Path
@@ -1020,7 +1021,7 @@ def short_method_name(method):
         "equal": "Equal",
         "inverse_volatility": "Inv Vol",
         "risk_parity": "Risk Parity",
-        "markowitz_best_sharpe_default": "Markowitz",
+        "markowitz_best_sharpe_default": "Markowitz-style Mean-Volatility",
         "cvar_bootstrap": "CVaR Boot",
         "cvar_montecarlo": "CVaR MC",
         BENCHMARK_NAME: "S&P 500",

@@ -18,20 +18,20 @@ The `notebooks/04_backtest_allocation_only.ipynb` / `scripts/04_backtest_allocat
 
 The `notebooks/05_backtest_full_pipeline_walkforward.ipynb` / `scripts/05_backtest_full_pipeline_walkforward.py` files reduce the major step-02 look-ahead problem by re-running clustering and stock selection at every rebalance date using only returns available up to that date.
 
-The remaining major limitation is constituent bias: the investable universe still comes from the current S&P 500 list in the project data, not a point-in-time historical S&P 500 membership dataset.
+The remaining major limitation is constituent bias: the investable universe still comes from the current S&P 500 list in the project data, not a point-in-time historical S&P 500 membership dataset. Results should be described as a current-constituent walk-forward simulation, not as a fully point-in-time historical S&P 500 backtest.
 
 ## Leakage Checklist
 
 | Area | Current Status | Risk Level | Notes |
 |---|---|---:|---|
 | Current S&P 500 universe from Wikipedia | Uses current constituents | High for historical backtest | Creates survivorship/constituent bias if presented as a historical S&P 500 strategy |
-| Step 02 stock selection | Uses full returns from `2019-01-03` to `2026-05-01` | High for full-pipeline backtest | Clustering and Sharpe selection see future returns relative to the `2022-01-03` backtest start |
+| Step 02 stock selection | Uses full returns from `2019-01-03` to `2026-05-01` | High for full-pipeline backtest | Clustering and historical Sharpe ranking see future returns relative to the `2022-01-03` backtest start |
 | Step 03 static allocation | Uses full available history | Not a backtest | Fine for "current allocation as of latest data", not for historical performance claims |
 | Step 04 allocation weights | Uses `train_returns = returns_selected.loc[:rebalance_date]` | Low | No future returns are used when computing weights inside each rebalance |
 | Step 04 realized performance | Uses only future holding returns after rebalance | Low | This is the correct out-of-sample measurement pattern |
 | Step 05 full-pipeline selection | Re-selects stocks every rebalance using only past returns | Low for selection leakage | This fixes the fixed-25-stock look-ahead issue from Step 04 |
 | Step 05 investable universe | Still uses current S&P 500 constituents | High for true historical S&P 500 claim | Requires point-in-time constituent data to fully fix |
-| Markowitz delta selection in Step 04 | Picks max training Sharpe each rebalance | Medium | Not future leakage, but can overfit because hyperparameter selection and model fitting use the same train sample |
+| Markowitz-style delta selection in Step 04 | Picks max training Sharpe each rebalance | Medium | Not future leakage, but can overfit because hyperparameter selection and model fitting use the same train sample |
 | CVaR tradeoff in Step 04 | Fixed at `1.0` | Low | No tuning leakage currently |
 | Risk-free rate in Step 04 | Historical FRED `DGS3MO` aligned by date | Low/Medium | Good enough for research; for strict tradable tests, lag by one business day to account for publication timing |
 | Dropping rows with selected-stock NaNs | Uses the fixed selected universe | Medium if delistings appear later | With current selected stocks all have full observations, but this can hide future availability issues in broader tests |
@@ -61,7 +61,7 @@ The current backtest is not safe for this stronger claim:
 Reason:
 
 - The 25 stocks were selected once using full history through `2026-05-01`.
-- A true backtest starting on `2022-01-03` could not know the full 2022-2026 Sharpe rankings.
+- A true backtest starting on `2022-01-03` could not know the full 2022-2026 historical Sharpe rankings.
 - The S&P 500 universe is the current Wikipedia list, not point-in-time historical constituents.
 
 After adding Step 05, this stronger claim becomes closer but still needs careful wording:
@@ -94,7 +94,7 @@ Use this level to compare:
 - Equal Weight
 - Inverse Volatility
 - Risk Parity
-- Markowitz
+- Markowitz-style Mean-Volatility Optimization
 - CVaR Bootstrap
 - CVaR Monte Carlo
 
@@ -102,7 +102,7 @@ Use this level to compare:
 
 Use this when tuning parameters such as:
 
-- Markowitz `delta`
+- Markowitz-style `delta`
 - CVaR `return_tradeoff`
 - `MAX_WEIGHT`
 - `N_CLUSTERS`
@@ -135,7 +135,7 @@ use only data available up to rebalance date
 build/limit the investable universe
 compute correlation
 cluster stocks
-select one stock per cluster by Sharpe
+select one stock per cluster by historical Sharpe ranking
 allocate portfolio
 hold next month
 record realized returns
@@ -159,7 +159,7 @@ Current Step 05 behavior:
 - Last holding date: `2026-05-01`
 - Rebalance count: `53`
 - Selects 25 stocks at every rebalance
-- Uses only returns up to each rebalance date for clustering, Sharpe ranking, and portfolio allocation
+- Uses only returns up to each rebalance date for clustering, historical Sharpe ranking, and portfolio allocation
 - Uses current S&P 500 constituents from Step 01, not point-in-time constituents
 
 Step 05 output interpretation:
