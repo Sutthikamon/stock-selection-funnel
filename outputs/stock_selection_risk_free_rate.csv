@@ -1,0 +1,2 @@
+source,series_id,description,observation_date,annual_rate_percent,annual_rate_decimal,as_of_returns_date,used_for
+FRED,DGS3MO,3-Month Treasury Constant Maturity Rate,2026-04-30,3.68,0.0368,2026-05-01,stock_selection_sharpe

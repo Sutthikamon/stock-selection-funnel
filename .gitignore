@@ -15,7 +15,7 @@ env/
 Thumbs.db
 *.log
 
-#Generated data and outputs are kept in this research repo by default.
-#Uncomment these if you want a code-only repository.
-data/
-outputs/
+# Generated data and outputs are kept in this research repo by default.
+# Uncomment these if you want a code-only repository.
+# data/
+# outputs/

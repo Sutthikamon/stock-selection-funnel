@@ -1,0 +1,12 @@
+Item,Value
+S&P 500 universe rows,503
+Usable return tickers,502
+Return observations,"1,842"
+Return date range,2019-01-03 to 2026-05-01
+Benchmark,^GSPC
+Static selected stocks from Step 02,25
+Full-pipeline rebalance count,53
+Full-pipeline first holding date,2022-01-03
+Full-pipeline last holding date,2026-05-01
+Full-pipeline unique selected stocks,114
+Average monthly selection overlap,0.6075

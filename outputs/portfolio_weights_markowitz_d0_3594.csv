@@ -1,0 +1,26 @@
+ticker,weight,company_name,sector,sub_industry,cluster_id,sharpe_ratio
+AAPL,0.09999999999999998,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",19,0.9144976393461364
+HWM,0.09999999999999988,Howmet Aerospace,Industrials,Aerospace & Defense,17,1.0833411154737191
+MRNA,0.09999999999999984,Moderna,Health Care,Biotechnology,18,0.1673093116614791
+STLD,0.09999999999999984,Steel Dynamics,Materials,Steel,21,0.7375547761559569
+LLY,0.09999999999999983,Lilly (Eli),Health Care,Pharmaceuticals,23,0.9759801128453782
+STX,0.09999999999999983,Seagate Technology,Information Technology,"Technology Hardware, Storage & Peripherals",10,1.1929713180792945
+VRT,0.09999999999999981,Vertiv,Industrials,Electrical Components & Equipment,13,1.0402618918020048
+NVDA,0.09999999999999977,Nvidia,Information Technology,Semiconductors,12,1.3940509605265778
+MCK,0.09999999999999976,McKesson Corporation,Health Care,Health Care Distributors,22,0.9942387478882512
+PWR,0.09999999999999974,Quanta Services,Industrials,Construction & Engineering,16,1.4193912785946847
+COST,2.794427680233298e-16,Costco,Consumer Staples,Consumer Staples Merchandise Retail,3,1.0005629788573591
+EA,2.7075398288139397e-16,Electronic Arts,Communication Services,Interactive Home Entertainment,20,0.3630337269751563
+KR,2.2902371720126266e-16,Kroger,Consumer Staples,Food Retail,4,0.4310633509525201
+TKO,2.0979537058727477e-16,TKO Group Holdings,Communication Services,Movies & Entertainment,14,0.3026471975745246
+SW,1.644833511284368e-16,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,15,0.1356713241946236
+HCA,1.28536130026897e-16,HCA Healthcare,Health Care,Health Care Facilities,25,0.4697923294082844
+MSI,1.1343766669791392e-16,Motorola Solutions,Information Technology,Communications Equipment,24,0.6745795362896225
+TMUS,1.0390992233882193e-16,T-Mobile US,Communication Services,Wireless Telecommunication Services,7,0.4951035143012142
+MCD,7.932334066925059e-17,McDonald's,Consumer Discretionary,Restaurants,6,0.2818477761279309
+TGT,5.09094935107634e-17,Target Corporation,Consumer Staples,Consumer Staples Merchandise Retail,2,0.2562734242626199
+NEM,2.7655784393415986e-17,Newmont,Materials,Gold,11,0.4665195277131281
+PM,2.546790788643929e-17,Philip Morris International,Consumer Staples,Tobacco,1,0.6075251977941132
+CBOE,2.2189035384883986e-17,Cboe Global Markets,Financials,Financial Exchanges & Data,8,0.6059014989809154
+PGR,0.0,Progressive Corporation,Financials,Property & Casualty Insurance,9,0.7058543130593218
+IRM,0.0,Iron Mountain,Real Estate,Other Specialized REITs,5,0.7308371708980332

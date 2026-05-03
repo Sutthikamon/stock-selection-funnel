@@ -1,0 +1,8 @@
+Method,04 Allocation-only CAGR,05 Full-pipeline CAGR,CAGR Gap
+Equal Weight,27.37%,12.09%,15.28%
+Inverse Volatility,25.48%,12.70%,12.78%
+Risk Parity,23.43%,12.02%,11.41%
+Markowitz,26.48%,10.41%,16.08%
+CVaR Bootstrap,17.97%,12.63%,5.34%
+CVaR Monte Carlo,14.47%,9.87%,4.59%
+S&P 500,10.22%,10.22%,0.00%

@@ -1,0 +1,503 @@
+﻿Ticker,symbol,company_name,sector,missing_ratio_after_clean,days_abs_return_gt_30pct
+A,A,Agilent Technologies,Health Care,0.0,0
+AAPL,AAPL,Apple Inc.,Information Technology,0.0,0
+ABBV,ABBV,AbbVie,Health Care,0.0,0
+ABNB,ABNB,Airbnb,Consumer Discretionary,0.26601520086862107,0
+ABT,ABT,Abbott Laboratories,Health Care,0.0,0
+ACGL,ACGL,Arch Capital Group,Financials,0.0,0
+ACN,ACN,Accenture,Information Technology,0.0,0
+ADBE,ADBE,Adobe Inc.,Information Technology,0.0,0
+ADI,ADI,Analog Devices,Information Technology,0.0,0
+ADM,ADM,Archer Daniels Midland,Consumer Staples,0.0,0
+ADP,ADP,Automatic Data Processing,Industrials,0.0,0
+ADSK,ADSK,Autodesk,Information Technology,0.0,0
+AEE,AEE,Ameren,Utilities,0.0,0
+AEP,AEP,American Electric Power,Utilities,0.0,0
+AES,AES,AES Corporation,Utilities,0.0,0
+AFL,AFL,Aflac,Financials,0.0,0
+AIG,AIG,American International Group,Financials,0.0,0
+AIZ,AIZ,Assurant,Financials,0.0,0
+AJG,AJG,Arthur J. Gallagher & Co.,Financials,0.0,0
+AKAM,AKAM,Akamai Technologies,Information Technology,0.0,0
+ALB,ALB,Albemarle Corporation,Materials,0.0,0
+ALGN,ALGN,Align Technology,Health Care,0.0,2
+ALL,ALL,Allstate,Financials,0.0,0
+ALLE,ALLE,Allegion,Industrials,0.0,0
+AMAT,AMAT,Applied Materials,Information Technology,0.0,0
+AMCR,AMCR,Amcor,Materials,0.0,0
+AMD,AMD,Advanced Micro Devices,Information Technology,0.0,0
+AME,AME,Ametek,Industrials,0.0,0
+AMGN,AMGN,Amgen,Health Care,0.0,0
+AMP,AMP,Ameriprise Financial,Financials,0.0,0
+AMT,AMT,American Tower,Real Estate,0.0,0
+AMZN,AMZN,Amazon,Consumer Discretionary,0.0,0
+ANET,ANET,Arista Networks,Information Technology,0.0,0
+AON,AON,Aon plc,Financials,0.0,0
+AOS,AOS,A. O. Smith,Industrials,0.0,0
+APA,APA,APA Corporation,Energy,0.0,2
+APD,APD,Air Products,Materials,0.0,0
+APH,APH,Amphenol,Information Technology,0.0,0
+APO,APO,Apollo Global Management,Financials,0.0,0
+APP,APP,AppLovin,Information Technology,0.3121606948968513,2
+APTV,APTV,Aptiv,Consumer Discretionary,0.0,1
+ARE,ARE,Alexandria Real Estate Equities,Real Estate,0.0,0
+ARES,ARES,Ares Management,Financials,0.0,0
+ATO,ATO,Atmos Energy,Utilities,0.0,0
+AVB,AVB,AvalonBay Communities,Real Estate,0.0,0
+AVGO,AVGO,Broadcom,Information Technology,0.0,0
+AVY,AVY,Avery Dennison,Materials,0.0,0
+AWK,AWK,American Water Works,Utilities,0.0,0
+AXON,AXON,Axon Enterprise,Industrials,0.0,0
+AXP,AXP,American Express,Financials,0.0,0
+AZO,AZO,AutoZone,Consumer Discretionary,0.0,0
+BA,BA,Boeing,Industrials,0.0,0
+BAC,BAC,Bank of America,Financials,0.0,0
+BALL,BALL,Ball Corporation,Materials,0.0,0
+BAX,BAX,Baxter International,Health Care,0.0,0
+BBY,BBY,Best Buy,Consumer Discretionary,0.0,0
+BDX,BDX,Becton Dickinson,Health Care,0.0,0
+BEN,BEN,Franklin Resources,Financials,0.0,0
+BF-B,BF.B,Brown–Forman,Consumer Staples,0.0,0
+BG,BG,Bunge Global,Consumer Staples,0.0,0
+BIIB,BIIB,Biogen,Health Care,0.0,3
+BK,BK,BNY Mellon,Financials,0.0,0
+BKNG,BKNG,Booking Holdings,Consumer Discretionary,0.0,0
+BKR,BKR,Baker Hughes,Energy,0.0,0
+BLDR,BLDR,Builders FirstSource,Industrials,0.0,0
+BLK,BLK,BlackRock,Financials,0.0,0
+BMY,BMY,Bristol Myers Squibb,Health Care,0.0,0
+BR,BR,Broadridge Financial Solutions,Industrials,0.0,0
+BRK-B,BRK.B,Berkshire Hathaway,Financials,0.0,0
+BRO,BRO,Brown & Brown,Financials,0.0,0
+BSX,BSX,Boston Scientific,Health Care,0.0,0
+BX,BX,Blackstone Inc.,Financials,0.0,0
+BXP,BXP,"BXP, Inc.",Real Estate,0.0,0
+C,C,Citigroup,Financials,0.0,0
+CAG,CAG,Conagra Brands,Consumer Staples,0.0,0
+CAH,CAH,Cardinal Health,Health Care,0.0,0
+CARR,CARR,Carrier Global,Industrials,0.16558089033659065,0
+CASY,CASY,Casey's,Consumer Staples,0.0,0
+CAT,CAT,Caterpillar Inc.,Industrials,0.0,0
+CB,CB,Chubb Limited,Financials,0.0,0
+CBOE,CBOE,Cboe Global Markets,Financials,0.0,0
+CBRE,CBRE,CBRE Group,Real Estate,0.0,0
+CCI,CCI,Crown Castle,Real Estate,0.0,0
+CCL,CCL,Carnival,Consumer Discretionary,0.0,3
+CDNS,CDNS,Cadence Design Systems,Information Technology,0.0,0
+CDW,CDW,CDW Corporation,Information Technology,0.0,0
+CEG,CEG,Constellation Energy,Utilities,0.4169381107491857,0
+CF,CF,CF Industries,Materials,0.0,0
+CFG,CFG,Citizens Financial Group,Financials,0.0,0
+CHD,CHD,Church & Dwight,Consumer Staples,0.0,0
+CHRW,CHRW,C.H. Robinson,Industrials,0.0,0
+CHTR,CHTR,Charter Communications,Communication Services,0.0,0
+CI,CI,Cigna,Health Care,0.0,0
+CIEN,CIEN,Ciena,Information Technology,0.0,0
+CINF,CINF,Cincinnati Financial,Financials,0.0,0
+CL,CL,Colgate-Palmolive,Consumer Staples,0.0,0
+CLX,CLX,Clorox,Consumer Staples,0.0,0
+CMCSA,CMCSA,Comcast,Communication Services,0.0,0
+CME,CME,CME Group,Financials,0.0,0
+CMG,CMG,Chipotle Mexican Grill,Consumer Discretionary,0.0,0
+CMI,CMI,Cummins,Industrials,0.0,0
+CMS,CMS,CMS Energy,Utilities,0.0,0
+CNC,CNC,Centene Corporation,Health Care,0.0,1
+CNP,CNP,CenterPoint Energy,Utilities,0.0,0
+COF,COF,Capital One,Financials,0.0,0
+COHR,COHR,Coherent Corp.,Information Technology,0.0,0
+COIN,COIN,Coinbase,Financials,0.3116178067318133,1
+COO,COO,Cooper Companies (The),Health Care,0.0,0
+COP,COP,ConocoPhillips,Energy,0.0,0
+COR,COR,Cencora,Health Care,0.0,0
+COST,COST,Costco,Consumer Staples,0.0,0
+CPAY,CPAY,Corpay,Financials,0.0,0
+CPB,CPB,Campbell's Company (The),Consumer Staples,0.0,0
+CPRT,CPRT,Copart,Industrials,0.0,0
+CPT,CPT,Camden Property Trust,Real Estate,0.0,0
+CRH,CRH,CRH plc,Materials,0.0,0
+CRL,CRL,Charles River Laboratories,Health Care,0.0,0
+CRM,CRM,Salesforce,Information Technology,0.0,0
+CRWD,CRWD,CrowdStrike,Information Technology,0.06026058631921824,0
+CSCO,CSCO,Cisco,Information Technology,0.0,0
+CSGP,CSGP,CoStar Group,Real Estate,0.0,0
+CSX,CSX,CSX Corporation,Industrials,0.0,0
+CTAS,CTAS,Cintas,Industrials,0.0,0
+CTRA,CTRA,Coterra,Energy,0.0,0
+CTSH,CTSH,Cognizant,Information Technology,0.0,0
+CTVA,CTVA,Corteva,Materials,0.05374592833876222,0
+CVNA,CVNA,Carvana,Consumer Discretionary,0.0,12
+CVS,CVS,CVS Health,Health Care,0.0,0
+CVX,CVX,Chevron Corporation,Energy,0.0,0
+D,D,Dominion Energy,Utilities,0.0,0
+DAL,DAL,Delta Air Lines,Industrials,0.0,0
+DASH,DASH,DoorDash,Consumer Discretionary,0.26547231270358307,0
+DD,DD,DuPont,Materials,0.0,0
+DDOG,DDOG,Datadog,Information Technology,0.09771986970684039,0
+DE,DE,Deere & Company,Industrials,0.0,0
+DECK,DECK,Deckers Brands,Consumer Discretionary,0.0,0
+DELL,DELL,Dell Technologies,Information Technology,0.0,1
+DG,DG,Dollar General,Consumer Staples,0.0,1
+DGX,DGX,Quest Diagnostics,Health Care,0.0,0
+DHI,DHI,D. R. Horton,Consumer Discretionary,0.0,0
+DHR,DHR,Danaher Corporation,Health Care,0.0,0
+DIS,DIS,Walt Disney Company (The),Communication Services,0.0,0
+DLR,DLR,Digital Realty,Real Estate,0.0,0
+DLTR,DLTR,Dollar Tree,Consumer Staples,0.0,0
+DOC,DOC,Healthpeak Properties,Real Estate,0.0,0
+DOV,DOV,Dover Corporation,Industrials,0.0,0
+DOW,DOW,Dow Inc.,Materials,0.028773072747014114,0
+DPZ,DPZ,Domino's,Consumer Discretionary,0.0,0
+DRI,DRI,Darden Restaurants,Consumer Discretionary,0.0,1
+DTE,DTE,DTE Energy,Utilities,0.0,0
+DUK,DUK,Duke Energy,Utilities,0.0,0
+DVA,DVA,DaVita,Health Care,0.0,0
+DVN,DVN,Devon Energy,Energy,0.0,1
+DXCM,DXCM,Dexcom,Health Care,0.0,1
+EA,EA,Electronic Arts,Communication Services,0.0,0
+EBAY,EBAY,eBay Inc.,Consumer Discretionary,0.0,0
+ECL,ECL,Ecolab,Materials,0.0,0
+ED,ED,Consolidated Edison,Utilities,0.0,0
+EFX,EFX,Equifax,Industrials,0.0,0
+EG,EG,Everest Group,Financials,0.0,0
+EIX,EIX,Edison International,Utilities,0.0,0
+EL,EL,Estée Lauder Companies (The),Consumer Staples,0.0,0
+ELV,ELV,Elevance Health,Health Care,0.0,0
+EME,EME,Emcor,Industrials,0.0,0
+EMR,EMR,Emerson Electric,Industrials,0.0,0
+EOG,EOG,EOG Resources,Energy,0.0,1
+EPAM,EPAM,EPAM Systems,Information Technology,0.0,1
+EQIX,EQIX,Equinix,Real Estate,0.0,0
+EQR,EQR,Equity Residential,Real Estate,0.0,0
+EQT,EQT,EQT Corporation,Energy,0.0,1
+ERIE,ERIE,Erie Indemnity,Financials,0.0,0
+ES,ES,Eversource Energy,Utilities,0.0,0
+ESS,ESS,Essex Property Trust,Real Estate,0.0,0
+ETN,ETN,Eaton Corporation,Industrials,0.0,0
+ETR,ETR,Entergy,Utilities,0.0,0
+EVRG,EVRG,Evergy,Utilities,0.0,0
+EW,EW,Edwards Lifesciences,Health Care,0.0,1
+EXC,EXC,Exelon,Utilities,0.0,0
+EXE,EXE,Expand Energy,Energy,0.28827361563517917,0
+EXPD,EXPD,Expeditors International,Industrials,0.0,0
+EXPE,EXPE,Expedia Group,Consumer Discretionary,0.0,0
+EXR,EXR,Extra Space Storage,Real Estate,0.0,0
+F,F,Ford Motor Company,Consumer Discretionary,0.0,0
+FANG,FANG,Diamondback Energy,Energy,0.0,2
+FAST,FAST,Fastenal,Industrials,0.0,0
+FCX,FCX,Freeport-McMoRan,Materials,0.0,0
+FDS,FDS,FactSet,Financials,0.0,0
+FDX,FDX,FedEx,Industrials,0.0,0
+FE,FE,FirstEnergy,Utilities,0.0,0
+FFIV,FFIV,"F5, Inc.",Information Technology,0.0,0
+FICO,FICO,Fair Isaac,Information Technology,0.0,1
+FIS,FIS,Fidelity National Information Services,Financials,0.0,0
+FISV,FISV,Fiserv,Financials,0.0,1
+FITB,FITB,Fifth Third Bancorp,Financials,0.0,0
+FIX,FIX,Comfort Systems USA,Industrials,0.0,0
+FOX,FOX,Fox Corporation (Class B),Communication Services,0.026058631921824105,0
+FOXA,FOXA,Fox Corporation (Class A),Communication Services,0.025515743756786103,0
+FRT,FRT,Federal Realty Investment Trust,Real Estate,0.0,1
+FSLR,FSLR,First Solar,Information Technology,0.0,0
+FTNT,FTNT,Fortinet,Information Technology,0.0,0
+FTV,FTV,Fortive,Industrials,0.0,0
+GD,GD,General Dynamics,Industrials,0.0,0
+GDDY,GDDY,GoDaddy,Information Technology,0.0,0
+GE,GE,GE Aerospace,Industrials,0.0,0
+GEHC,GEHC,GE HealthCare,Health Care,0.5412595005428882,0
+GEN,GEN,Gen Digital,Information Technology,0.0,0
+GEV,GEV,GE Vernova,Industrials,0.7149837133550488,0
+GILD,GILD,Gilead Sciences,Health Care,0.0,0
+GIS,GIS,General Mills,Consumer Staples,0.0,0
+GL,GL,Globe Life,Financials,0.0,1
+GLW,GLW,Corning Inc.,Information Technology,0.0,0
+GM,GM,General Motors,Consumer Discretionary,0.0,0
+GNRC,GNRC,Generac,Industrials,0.0,0
+GOOG,GOOG,Alphabet Inc. (Class C),Communication Services,0.0,0
+GOOGL,GOOGL,Alphabet Inc. (Class A),Communication Services,0.0,0
+GPC,GPC,Genuine Parts Company,Consumer Discretionary,0.0,0
+GPN,GPN,Global Payments,Financials,0.0,0
+GRMN,GRMN,Garmin,Consumer Discretionary,0.0,0
+GS,GS,Goldman Sachs,Financials,0.0,0
+GWW,GWW,W. W. Grainger,Industrials,0.0,0
+HAL,HAL,Halliburton,Energy,0.0,1
+HAS,HAS,Hasbro,Consumer Discretionary,0.0,0
+HBAN,HBAN,Huntington Bancshares,Financials,0.0,0
+HCA,HCA,HCA Healthcare,Health Care,0.0,0
+HD,HD,Home Depot (The),Consumer Discretionary,0.0,0
+HIG,HIG,Hartford (The),Financials,0.0,0
+HII,HII,Huntington Ingalls Industries,Industrials,0.0,0
+HLT,HLT,Hilton Worldwide,Consumer Discretionary,0.0,0
+HON,HON,Honeywell,Industrials,0.0,0
+HOOD,HOOD,Robinhood Markets,Financials,0.3517915309446254,1
+HPE,HPE,Hewlett Packard Enterprise,Information Technology,0.0,0
+HPQ,HPQ,HP Inc.,Information Technology,0.0,0
+HRL,HRL,Hormel Foods,Consumer Staples,0.0,0
+HSIC,HSIC,Henry Schein,Health Care,0.0,0
+HST,HST,Host Hotels & Resorts,Real Estate,0.0,1
+HSY,HSY,Hershey Company (The),Consumer Staples,0.0,0
+HUBB,HUBB,Hubbell Incorporated,Industrials,0.0,0
+HUM,HUM,Humana,Health Care,0.0,0
+HWM,HWM,Howmet Aerospace,Industrials,0.0,0
+IBKR,IBKR,Interactive Brokers,Financials,0.0,0
+IBM,IBM,IBM,Information Technology,0.0,0
+ICE,ICE,Intercontinental Exchange,Financials,0.0,0
+IDXX,IDXX,Idexx Laboratories,Health Care,0.0,0
+IEX,IEX,IDEX Corporation,Industrials,0.0,0
+IFF,IFF,International Flavors & Fragrances,Materials,0.0,0
+INCY,INCY,Incyte,Health Care,0.0,0
+INTC,INTC,Intel,Information Technology,0.0,0
+INTU,INTU,Intuit,Information Technology,0.0,0
+INVH,INVH,Invitation Homes,Real Estate,0.0,0
+IP,IP,International Paper,Materials,0.0,0
+IQV,IQV,IQVIA,Health Care,0.0,0
+IR,IR,Ingersoll Rand,Industrials,0.0,0
+IRM,IRM,Iron Mountain,Real Estate,0.0,0
+ISRG,ISRG,Intuitive Surgical,Health Care,0.0,0
+IT,IT,Gartner,Information Technology,0.0,0
+ITW,ITW,Illinois Tool Works,Industrials,0.0,0
+IVZ,IVZ,Invesco,Financials,0.0,0
+J,J,Jacobs Solutions,Industrials,0.0,0
+JBHT,JBHT,J.B. Hunt,Industrials,0.0,0
+JBL,JBL,Jabil,Information Technology,0.0,0
+JCI,JCI,Johnson Controls,Industrials,0.0,0
+JKHY,JKHY,Jack Henry & Associates,Financials,0.0,0
+JNJ,JNJ,Johnson & Johnson,Health Care,0.0,0
+JPM,JPM,JPMorgan Chase,Financials,0.0,0
+KDP,KDP,Keurig Dr Pepper,Consumer Staples,0.0,0
+KEY,KEY,KeyCorp,Financials,0.0,0
+KEYS,KEYS,Keysight Technologies,Information Technology,0.0,0
+KHC,KHC,Kraft Heinz,Consumer Staples,0.0,0
+KIM,KIM,Kimco Realty,Real Estate,0.0,1
+KKR,KKR,KKR & Co.,Financials,0.0,0
+KLAC,KLAC,KLA Corporation,Information Technology,0.0,0
+KMB,KMB,Kimberly-Clark,Consumer Staples,0.0,0
+KMI,KMI,Kinder Morgan,Energy,0.0,0
+KO,KO,Coca-Cola Company (The),Consumer Staples,0.0,0
+KR,KR,Kroger,Consumer Staples,0.0,0
+KVUE,KVUE,Kenvue,Consumer Staples,0.5928338762214984,0
+L,L,Loews Corporation,Financials,0.0,0
+LDOS,LDOS,Leidos,Industrials,0.0,0
+LEN,LEN,Lennar,Consumer Discretionary,0.0,0
+LH,LH,Labcorp,Health Care,0.0,0
+LHX,LHX,L3Harris,Industrials,0.0,0
+LII,LII,Lennox International,Industrials,0.0,0
+LIN,LIN,Linde plc,Materials,0.0,0
+LITE,LITE,Lumentum,Information Technology,0.0,0
+LLY,LLY,Lilly (Eli),Health Care,0.0,0
+LMT,LMT,Lockheed Martin,Industrials,0.0,0
+LNT,LNT,Alliant Energy,Utilities,0.0,0
+LOW,LOW,Lowe's,Consumer Discretionary,0.0,0
+LRCX,LRCX,Lam Research,Information Technology,0.0,0
+LULU,LULU,Lululemon Athletica,Consumer Discretionary,0.0,0
+LUV,LUV,Southwest Airlines,Industrials,0.0,0
+LVS,LVS,Las Vegas Sands,Consumer Discretionary,0.0,0
+LYB,LYB,LyondellBasell,Materials,0.0,0
+LYV,LYV,Live Nation Entertainment,Communication Services,0.0,0
+MA,MA,Mastercard,Financials,0.0,0
+MAA,MAA,Mid-America Apartment Communities,Real Estate,0.0,0
+MAR,MAR,Marriott International,Consumer Discretionary,0.0,0
+MAS,MAS,Masco,Industrials,0.0,0
+MCD,MCD,McDonald's,Consumer Discretionary,0.0,0
+MCHP,MCHP,Microchip Technology,Information Technology,0.0,0
+MCK,MCK,McKesson Corporation,Health Care,0.0,0
+MCO,MCO,Moody's Corporation,Financials,0.0,0
+MDLZ,MDLZ,Mondelez International,Consumer Staples,0.0,0
+MDT,MDT,Medtronic,Health Care,0.0,0
+MET,MET,MetLife,Financials,0.0,0
+META,META,Meta Platforms,Communication Services,0.0,0
+MGM,MGM,MGM Resorts,Consumer Discretionary,0.0,2
+MKC,MKC,McCormick & Company,Consumer Staples,0.0,0
+MLM,MLM,Martin Marietta Materials,Materials,0.0,0
+MMM,MMM,3M,Industrials,0.0,0
+MNST,MNST,Monster Beverage,Consumer Staples,0.0,0
+MO,MO,Altria,Consumer Staples,0.0,0
+MOS,MOS,Mosaic Company (The),Materials,0.0,0
+MPC,MPC,Marathon Petroleum,Energy,0.0,0
+MPWR,MPWR,Monolithic Power Systems,Information Technology,0.0,0
+MRK,MRK,Merck & Co.,Health Care,0.0,0
+MRNA,MRNA,Moderna,Health Care,0.0,0
+MRSH,MRSH,Marsh McLennan,Financials,0.0,0
+MS,MS,Morgan Stanley,Financials,0.0,0
+MSCI,MSCI,MSCI Inc.,Financials,0.0,0
+MSFT,MSFT,Microsoft,Information Technology,0.0,0
+MSI,MSI,Motorola Solutions,Information Technology,0.0,0
+MTB,MTB,M&T Bank,Financials,0.0,0
+MTD,MTD,Mettler Toledo,Health Care,0.0,0
+MU,MU,Micron Technology,Information Technology,0.0,0
+NCLH,NCLH,Norwegian Cruise Line Holdings,Consumer Discretionary,0.0,2
+NDAQ,NDAQ,"Nasdaq, Inc.",Financials,0.0,0
+NDSN,NDSN,Nordson Corporation,Industrials,0.0,0
+NEE,NEE,NextEra Energy,Utilities,0.0,0
+NEM,NEM,Newmont,Materials,0.0,0
+NFLX,NFLX,Netflix,Communication Services,0.0,1
+NI,NI,NiSource,Utilities,0.0,0
+NKE,NKE,"Nike, Inc.",Consumer Discretionary,0.0,0
+NOC,NOC,Northrop Grumman,Industrials,0.0,0
+NOW,NOW,ServiceNow,Information Technology,0.0,0
+NRG,NRG,NRG Energy,Utilities,0.0,0
+NSC,NSC,Norfolk Southern,Industrials,0.0,0
+NTAP,NTAP,NetApp,Information Technology,0.0,0
+NTRS,NTRS,Northern Trust,Financials,0.0,0
+NUE,NUE,Nucor,Materials,0.0,0
+NVDA,NVDA,Nvidia,Information Technology,0.0,0
+NVR,NVR,"NVR, Inc.",Consumer Discretionary,0.0,0
+NWS,NWS,News Corp (Class B),Communication Services,0.0,0
+NWSA,NWSA,News Corp (Class A),Communication Services,0.0,0
+NXPI,NXPI,NXP Semiconductors,Information Technology,0.0,0
+O,O,Realty Income,Real Estate,0.0,0
+ODFL,ODFL,Old Dominion,Industrials,0.0,0
+OKE,OKE,Oneok,Energy,0.0,2
+OMC,OMC,Omnicom Group,Communication Services,0.0,0
+ON,ON,ON Semiconductor,Information Technology,0.0,0
+ORCL,ORCL,Oracle Corporation,Information Technology,0.0,1
+ORLY,ORLY,O’Reilly Automotive,Consumer Discretionary,0.0,0
+OTIS,OTIS,Otis Worldwide,Industrials,0.16558089033659065,0
+OXY,OXY,Occidental Petroleum,Energy,0.0,2
+PANW,PANW,Palo Alto Networks,Information Technology,0.0,0
+PAYX,PAYX,Paychex,Industrials,0.0,0
+PCAR,PCAR,Paccar,Industrials,0.0,0
+PCG,PCG,PG&E Corporation,Utilities,0.0,4
+PEG,PEG,Public Service Enterprise Group,Utilities,0.0,0
+PEP,PEP,PepsiCo,Consumer Staples,0.0,0
+PFE,PFE,Pfizer,Health Care,0.0,0
+PFG,PFG,Principal Financial Group,Financials,0.0,0
+PG,PG,Procter & Gamble,Consumer Staples,0.0,0
+PGR,PGR,Progressive Corporation,Financials,0.0,0
+PH,PH,Parker Hannifin,Industrials,0.0,0
+PHM,PHM,PulteGroup,Consumer Discretionary,0.0,0
+PKG,PKG,Packaging Corporation of America,Materials,0.0,0
+PLD,PLD,Prologis,Real Estate,0.0,0
+PLTR,PLTR,Palantir Technologies,Information Technology,0.23887079261672095,1
+PM,PM,Philip Morris International,Consumer Staples,0.0,0
+PNC,PNC,PNC Financial Services,Financials,0.0,0
+PNR,PNR,Pentair,Industrials,0.0,0
+PNW,PNW,Pinnacle West Capital,Utilities,0.0,0
+PODD,PODD,Insulet Corporation,Health Care,0.0,0
+POOL,POOL,Pool Corporation,Consumer Discretionary,0.0,0
+PPG,PPG,PPG Industries,Materials,0.0,0
+PPL,PPL,PPL Corporation,Utilities,0.0,0
+PRU,PRU,Prudential Financial,Financials,0.0,0
+PSA,PSA,Public Storage,Real Estate,0.0,0
+PSKY,PSKY,Paramount Skydance Corporation,Communication Services,0.0,2
+PSX,PSX,Phillips 66,Energy,0.0,0
+PTC,PTC,PTC Inc.,Information Technology,0.0,0
+PWR,PWR,Quanta Services,Industrials,0.0,0
+PYPL,PYPL,PayPal,Financials,0.0,0
+QCOM,QCOM,Qualcomm,Information Technology,0.0,0
+RCL,RCL,Royal Caribbean Group,Consumer Discretionary,0.0,1
+REG,REG,Regency Centers,Real Estate,0.0,1
+REGN,REGN,Regeneron Pharmaceuticals,Health Care,0.0,0
+RF,RF,Regions Financial Corporation,Financials,0.0,0
+RJF,RJF,Raymond James Financial,Financials,0.0,0
+RL,RL,Ralph Lauren Corporation,Consumer Discretionary,0.0,0
+RMD,RMD,ResMed,Health Care,0.0,0
+ROK,ROK,Rockwell Automation,Industrials,0.0,0
+ROL,ROL,"Rollins, Inc.",Industrials,0.0,0
+ROP,ROP,Roper Technologies,Information Technology,0.0,0
+ROST,ROST,Ross Stores,Consumer Discretionary,0.0,0
+RSG,RSG,Republic Services,Industrials,0.0,0
+RTX,RTX,RTX Corporation,Industrials,0.0,0
+RVTY,RVTY,Revvity,Health Care,0.0,0
+SATS,SATS,EchoStar,Communication Services,0.0,4
+SBAC,SBAC,SBA Communications,Real Estate,0.0,0
+SBUX,SBUX,Starbucks,Consumer Discretionary,0.0,0
+SCHW,SCHW,Charles Schwab Corporation,Financials,0.0,0
+SHW,SHW,Sherwin-Williams,Materials,0.0,0
+SJM,SJM,J.M. Smucker Company (The),Consumer Staples,0.0,0
+SLB,SLB,Schlumberger,Energy,0.0,0
+SMCI,SMCI,Supermicro,Information Technology,0.0,6
+SNA,SNA,Snap-on,Industrials,0.0,0
+SNDK,SNDK,Sandisk,Information Technology,0.8349619978284474,0
+SNPS,SNPS,Synopsys,Information Technology,0.0,1
+SO,SO,Southern Company,Utilities,0.0,0
+SOLV,SOLV,Solventum,Health Care,0.7144408251900108,0
+SPG,SPG,Simon Property Group,Real Estate,0.0,0
+SPGI,SPGI,S&P Global,Financials,0.0,0
+SRE,SRE,Sempra,Utilities,0.0,0
+STE,STE,Steris,Health Care,0.0,0
+STLD,STLD,Steel Dynamics,Materials,0.0,0
+STT,STT,State Street Corporation,Financials,0.0,0
+STX,STX,Seagate Technology,Information Technology,0.0,0
+STZ,STZ,Constellation Brands,Consumer Staples,0.0,0
+SW,SW,Smurfit Westrock,Materials,0.0,0
+SWK,SWK,Stanley Black & Decker,Industrials,0.0,0
+SWKS,SWKS,Skyworks Solutions,Information Technology,0.0,0
+SYF,SYF,Synchrony Financial,Financials,0.0,0
+SYK,SYK,Stryker Corporation,Health Care,0.0,0
+SYY,SYY,Sysco,Consumer Staples,0.0,0
+T,T,AT&T,Communication Services,0.0,0
+TAP,TAP,Molson Coors Beverage Company,Consumer Staples,0.0,0
+TDG,TDG,TransDigm Group,Industrials,0.0,0
+TDY,TDY,Teledyne Technologies,Information Technology,0.0,0
+TECH,TECH,Bio-Techne,Health Care,0.0,0
+TEL,TEL,TE Connectivity,Information Technology,0.0,0
+TER,TER,Teradyne,Information Technology,0.0,0
+TFC,TFC,Truist Financial,Financials,0.0,0
+TGT,TGT,Target Corporation,Consumer Staples,0.0,0
+TJX,TJX,TJX Companies,Consumer Discretionary,0.0,0
+TKO,TKO,TKO Group Holdings,Communication Services,0.0,0
+TMO,TMO,Thermo Fisher Scientific,Health Care,0.0,0
+TMUS,TMUS,T-Mobile US,Communication Services,0.0,0
+TPL,TPL,Texas Pacific Land Corporation,Energy,0.0,0
+TPR,TPR,"Tapestry, Inc.",Consumer Discretionary,0.0,0
+TRGP,TRGP,Targa Resources,Energy,0.0,3
+TRMB,TRMB,Trimble Inc.,Information Technology,0.0,0
+TROW,TROW,T. Rowe Price,Financials,0.0,0
+TRV,TRV,Travelers Companies (The),Financials,0.0,0
+TSCO,TSCO,Tractor Supply,Consumer Discretionary,0.0,0
+TSLA,TSLA,"Tesla, Inc.",Consumer Discretionary,0.0,0
+TSN,TSN,Tyson Foods,Consumer Staples,0.0,0
+TT,TT,Trane Technologies,Industrials,0.0,0
+TTD,TTD,Trade Desk (The),Communication Services,0.0,5
+TTWO,TTWO,Take-Two Interactive,Communication Services,0.0,0
+TXN,TXN,Texas Instruments,Information Technology,0.0,0
+TXT,TXT,Textron,Industrials,0.0,0
+TYL,TYL,Tyler Technologies,Information Technology,0.0,0
+UAL,UAL,United Airlines Holdings,Industrials,0.0,1
+UBER,UBER,Uber,Industrials,0.048317046688382194,1
+UDR,UDR,"UDR, Inc.",Real Estate,0.0,0
+UHS,UHS,Universal Health Services,Health Care,0.0,0
+ULTA,ULTA,Ulta Beauty,Consumer Discretionary,0.0,0
+UNH,UNH,UnitedHealth Group,Health Care,0.0,0
+UNP,UNP,Union Pacific Corporation,Industrials,0.0,0
+UPS,UPS,United Parcel Service,Industrials,0.0,0
+URI,URI,United Rentals,Industrials,0.0,0
+USB,USB,U.S. Bancorp,Financials,0.0,0
+V,V,Visa Inc.,Financials,0.0,0
+VICI,VICI,Vici Properties,Real Estate,0.0,0
+VLO,VLO,Valero Energy,Energy,0.0,1
+VLTO,VLTO,Veralto,Industrials,0.6498371335504886,0
+VMC,VMC,Vulcan Materials Company,Materials,0.0,0
+VRSK,VRSK,Verisk Analytics,Industrials,0.0,0
+VRSN,VRSN,Verisign,Information Technology,0.0,0
+VRT,VRT,Vertiv,Industrials,0.0,1
+VRTX,VRTX,Vertex Pharmaceuticals,Health Care,0.0,0
+VST,VST,Vistra Corp.,Utilities,0.0,0
+VTR,VTR,Ventas,Real Estate,0.0,0
+VTRS,VTRS,Viatris,Health Care,0.0,0
+VZ,VZ,Verizon,Communication Services,0.0,0
+WAB,WAB,Wabtec,Industrials,0.0,0
+WAT,WAT,Waters Corporation,Health Care,0.0,0
+WBD,WBD,Warner Bros. Discovery,Communication Services,0.0,0
+WDAY,WDAY,"Workday, Inc.",Information Technology,0.0,0
+WDC,WDC,Western Digital,Information Technology,0.0,0
+WEC,WEC,WEC Energy Group,Utilities,0.0,0
+WELL,WELL,Welltower,Real Estate,0.0,0
+WFC,WFC,Wells Fargo,Financials,0.0,0
+WM,WM,Waste Management,Industrials,0.0,0
+WMB,WMB,Williams Companies,Energy,0.0,0
+WMT,WMT,Walmart,Consumer Staples,0.0,0
+WRB,WRB,W. R. Berkley Corporation,Financials,0.0,0
+WSM,WSM,"Williams-Sonoma, Inc.",Consumer Discretionary,0.0,0
+WST,WST,West Pharmaceutical Services,Health Care,0.0,1
+WTW,WTW,Willis Towers Watson,Financials,0.0,0
+WY,WY,Weyerhaeuser,Real Estate,0.0,0
+WYNN,WYNN,Wynn Resorts,Consumer Discretionary,0.0,0
+XEL,XEL,Xcel Energy,Utilities,0.0,0
+XOM,XOM,ExxonMobil,Energy,0.0,0
+XYL,XYL,Xylem Inc.,Industrials,0.0,0
+XYZ,XYZ,"Block, Inc.",Financials,0.0,0
+YUM,YUM,Yum! Brands,Consumer Discretionary,0.0,0
+ZBH,ZBH,Zimmer Biomet,Health Care,0.0,0
+ZBRA,ZBRA,Zebra Technologies,Information Technology,0.0,0
+ZTS,ZTS,Zoetis,Health Care,0.0,0

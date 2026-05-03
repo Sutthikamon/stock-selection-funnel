@@ -1,0 +1,26 @@
+ticker,weight,company_name,sector,sub_industry,cluster_id,sharpe_ratio
+KR,0.10000000000000009,Kroger,Consumer Staples,Food Retail,4,0.4310633509525201
+PGR,0.10000000000000009,Progressive Corporation,Financials,Property & Casualty Insurance,9,0.7058543130593218
+MCK,0.10000000000000009,McKesson Corporation,Health Care,Health Care Distributors,22,0.9942387478882512
+LLY,0.10000000000000009,Lilly (Eli),Health Care,Pharmaceuticals,23,0.9759801128453782
+NEM,0.10000000000000009,Newmont,Materials,Gold,11,0.4665195277131281
+EA,0.10000000000000009,Electronic Arts,Communication Services,Interactive Home Entertainment,20,0.3630337269751563
+PWR,0.09104905183633732,Quanta Services,Industrials,Construction & Engineering,16,1.4193912785946847
+CBOE,0.08901766271344201,Cboe Global Markets,Financials,Financial Exchanges & Data,8,0.6059014989809154
+PM,0.07247981796125942,Philip Morris International,Consumer Staples,Tobacco,1,0.6075251977941132
+STX,0.0715609747483847,Seagate Technology,Information Technology,"Technology Hardware, Storage & Peripherals",10,1.1929713180792945
+VRT,0.053233201120007276,Vertiv,Industrials,Electrical Components & Equipment,13,1.0402618918020048
+MRNA,0.022659291620568702,Moderna,Health Care,Biotechnology,18,0.1673093116614791
+MCD,0.0,McDonald's,Consumer Discretionary,Restaurants,6,0.2818477761279309
+TGT,0.0,Target Corporation,Consumer Staples,Consumer Staples Merchandise Retail,2,0.2562734242626199
+TMUS,0.0,T-Mobile US,Communication Services,Wireless Telecommunication Services,7,0.4951035143012142
+COST,0.0,Costco,Consumer Staples,Consumer Staples Merchandise Retail,3,1.0005629788573591
+IRM,0.0,Iron Mountain,Real Estate,Other Specialized REITs,5,0.7308371708980332
+HWM,0.0,Howmet Aerospace,Industrials,Aerospace & Defense,17,1.0833411154737191
+SW,0.0,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,15,0.1356713241946236
+TKO,0.0,TKO Group Holdings,Communication Services,Movies & Entertainment,14,0.3026471975745246
+NVDA,0.0,Nvidia,Information Technology,Semiconductors,12,1.3940509605265778
+STLD,0.0,Steel Dynamics,Materials,Steel,21,0.7375547761559569
+AAPL,0.0,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",19,0.9144976393461364
+MSI,0.0,Motorola Solutions,Information Technology,Communications Equipment,24,0.6745795362896225
+HCA,0.0,HCA Healthcare,Health Care,Health Care Facilities,25,0.4697923294082844
