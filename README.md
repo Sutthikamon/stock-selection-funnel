@@ -87,6 +87,13 @@ Latest full-pipeline backtest window:
 | CVaR Monte Carlo | 9.87% | 0.4644 | -23.67% |
 | S&P 500 Benchmark | 10.22% | 0.4127 | -25.43% |
 
+## Audit And Review Outputs
+
+- Step 05 writes `outputs/full_pipeline_selected_stocks_history.csv` with `train_start_date`, `train_end_date`, and `selection_mode` for every selected-stock record. The current selection mode is `walk_forward_past_data_only`.
+- Step 05 writes `outputs/full_pipeline_missing_holding_returns.csv` as an audit file for missing realized holding-period returns. The latest run has zero missing-return audit rows.
+- Step 03 includes additional interpretation charts: `outputs/portfolio_mean_cvar_frontier.png` and `outputs/portfolio_absolute_risk_contribution_heatmap.png`.
+- `FILE_LIST_FOR_REVIEW.md` lists the main notebooks, documentation files, and generated outputs recommended for academic or GitHub review.
+
 ## Important Limitations
 
 - The universe is based on the current Wikipedia S&P 500 list, so historical tests still have current-constituent bias.

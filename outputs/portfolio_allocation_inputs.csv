@@ -1,2 +1,2 @@
 trading_days_per_year,lookback_mode,lookback_years,train_start_date,train_end_date,train_observations,risk_free_rate_annual_decimal,risk_free_rate_daily_decimal,risk_free_source,risk_free_series_id,risk_free_observation_date
-252,full_history,all_available,2019-01-03,2026-05-01,1842,0.0368,0.00014341919869242936,FRED,DGS3MO,2026-04-30
+252,full_history,all_available,2019-01-03,2026-05-01,1842,0.0368,0.00014341919869242936,FRED,DGS3MO,2026-05-01

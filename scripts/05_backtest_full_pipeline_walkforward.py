@@ -327,6 +327,9 @@ def select_stocks_for_rebalance(train_returns_all: pd.DataFrame, rebalance_date:
         )
 
     selected["rebalance_date"] = rebalance_date
+    selected["train_start_date"] = train_returns_all.index.min()
+    selected["train_end_date"] = rebalance_date
+    selected["selection_mode"] = "walk_forward_past_data_only"
     selected["eligible_universe_size"] = len(eligible)
     selected["selected_rank_in_cluster"] = 1
     selected = selected.reset_index().rename(columns={"index": "ticker"})

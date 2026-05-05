@@ -1,0 +1,26 @@
+ticker,weight,company_name,sector,sub_industry,cluster_id,sharpe_ratio
+STX,0.09999999999999984,Seagate Technology,Information Technology,"Technology Hardware, Storage & Peripherals",10,1.1929713180792945
+AAPL,0.09999999999999984,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",19,0.9144976393461364
+STLD,0.09999999999999984,Steel Dynamics,Materials,Steel,21,0.7375547761559569
+LLY,0.09999999999999984,Lilly (Eli),Health Care,Pharmaceuticals,23,0.9759801128453782
+MCK,0.09999999999999984,McKesson Corporation,Health Care,Health Care Distributors,22,0.9942387478882512
+HWM,0.09999999999999984,Howmet Aerospace,Industrials,Aerospace & Defense,17,1.0833411154737191
+PWR,0.09999999999999984,Quanta Services,Industrials,Construction & Engineering,16,1.4193912785946847
+NVDA,0.09999999999999976,Nvidia,Information Technology,Semiconductors,12,1.3940509605265778
+MRNA,0.09999999999999976,Moderna,Health Care,Biotechnology,18,0.1673093116614791
+VRT,0.09999999999999976,Vertiv,Industrials,Electrical Components & Equipment,13,1.0402618918020048
+NEM,5.922502436702291e-16,Newmont,Materials,Gold,11,0.4665195277131281
+MSI,3.0293941610239476e-16,Motorola Solutions,Information Technology,Communications Equipment,24,0.6745795362896225
+CBOE,2.6083894120870353e-16,Cboe Global Markets,Financials,Financial Exchanges & Data,8,0.6059014989809154
+COST,2.41417117643643e-16,Costco,Consumer Staples,Consumer Staples Merchandise Retail,3,1.0005629788573591
+EA,1.4565707319093757e-16,Electronic Arts,Communication Services,Interactive Home Entertainment,20,0.3630337269751563
+PGR,1.0590232862362763e-16,Progressive Corporation,Financials,Property & Casualty Insurance,9,0.7058543130593218
+MCD,9.979553022801921e-17,McDonald's,Consumer Discretionary,Restaurants,6,0.2818477761279309
+TGT,9.392764467325158e-17,Target Corporation,Consumer Staples,Consumer Staples Merchandise Retail,2,0.2562734242626199
+SW,6.009487381381481e-17,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,15,0.1356713241946236
+TMUS,4.387459548527492e-17,T-Mobile US,Communication Services,Wireless Telecommunication Services,7,0.4951035143012142
+PM,0.0,Philip Morris International,Consumer Staples,Tobacco,1,0.6075251977941132
+KR,0.0,Kroger,Consumer Staples,Food Retail,4,0.4310633509525201
+IRM,0.0,Iron Mountain,Real Estate,Other Specialized REITs,5,0.7308371708980332
+TKO,0.0,TKO Group Holdings,Communication Services,Movies & Entertainment,14,0.3026471975745246
+HCA,0.0,HCA Healthcare,Health Care,Health Care Facilities,25,0.4697923294082844

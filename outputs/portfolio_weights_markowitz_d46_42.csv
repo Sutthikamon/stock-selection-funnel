@@ -1,0 +1,26 @@
+ticker,weight,company_name,sector,sub_industry,cluster_id,sharpe_ratio
+COST,0.1,Costco,Consumer Staples,Consumer Staples Merchandise Retail,3,1.0005629788573591
+EA,0.09999999999999978,Electronic Arts,Communication Services,Interactive Home Entertainment,20,0.3630337269751563
+CBOE,0.0999999999999997,Cboe Global Markets,Financials,Financial Exchanges & Data,8,0.6059014989809154
+MCD,0.09999999999999959,McDonald's,Consumer Discretionary,Restaurants,6,0.2818477761279309
+KR,0.09999999999999956,Kroger,Consumer Staples,Food Retail,4,0.4310633509525201
+PGR,0.08008741683516528,Progressive Corporation,Financials,Property & Casualty Insurance,9,0.7058543130593218
+NEM,0.0768782400937508,Newmont,Materials,Gold,11,0.4665195277131281
+PM,0.06708056258001845,Philip Morris International,Consumer Staples,Tobacco,1,0.6075251977941132
+SW,0.06325528889427524,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,15,0.1356713241946236
+MCK,0.050538573095174004,McKesson Corporation,Health Care,Health Care Distributors,22,0.9942387478882512
+LLY,0.04550044545027548,Lilly (Eli),Health Care,Pharmaceuticals,23,0.9759801128453782
+TMUS,0.040658046567104686,T-Mobile US,Communication Services,Wireless Telecommunication Services,7,0.4951035143012142
+TKO,0.031043455422794852,TKO Group Holdings,Communication Services,Movies & Entertainment,14,0.3026471975745246
+MRNA,0.019783230714463102,Moderna,Health Care,Biotechnology,18,0.1673093116614791
+PWR,0.014057748787389579,Quanta Services,Industrials,Construction & Engineering,16,1.4193912785946847
+TGT,0.006057759169487173,Target Corporation,Consumer Staples,Consumer Staples Merchandise Retail,2,0.2562734242626199
+STX,0.005059232390099573,Seagate Technology,Information Technology,"Technology Hardware, Storage & Peripherals",10,1.1929713180792945
+NVDA,1.3930227697179142e-15,Nvidia,Information Technology,Semiconductors,12,1.3940509605265778
+STLD,9.957571623695728e-16,Steel Dynamics,Materials,Steel,21,0.7375547761559569
+AAPL,4.449572730953746e-16,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",19,0.9144976393461364
+IRM,1.840389146023641e-16,Iron Mountain,Real Estate,Other Specialized REITs,5,0.7308371708980332
+HWM,7.13998165290025e-17,Howmet Aerospace,Industrials,Aerospace & Defense,17,1.0833411154737191
+VRT,0.0,Vertiv,Industrials,Electrical Components & Equipment,13,1.0402618918020048
+MSI,0.0,Motorola Solutions,Information Technology,Communications Equipment,24,0.6745795362896225
+HCA,0.0,HCA Healthcare,Health Care,Health Care Facilities,25,0.4697923294082844

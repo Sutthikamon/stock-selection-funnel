@@ -1,6 +1,6 @@
 # References and Assumptions
 
-Last updated: 2026-05-03
+Last updated: 2026-05-05
 
 This file records where each part of the S&P 500 stock-selection and portfolio-allocation workflow came from, and which values are project assumptions rather than external defaults.
 
@@ -12,7 +12,7 @@ This file records where each part of the S&P 500 stock-selection and portfolio-a
 | 2 | `notebooks/02_select_stocks_clustering_mst.ipynb` | Use Spearman correlation, hierarchical clustering, and historical excess-Sharpe ranking to pick one stock per cluster. |
 | 3 | `notebooks/03_allocate_portfolios.ipynb` | Allocate portfolio weights with Equal Weight, Inverse Volatility, Markowitz-style Mean-Volatility Optimization, Risk Parity, CVaR Bootstrap, and CVaR Monte Carlo. |
 | 4 | `notebooks/04_backtest_allocation_only.ipynb` / `scripts/04_backtest_allocation_only.py` | Walk-forward backtest of allocation methods using the fixed Step 02 stock list. |
-| 5 | `notebooks/05_backtest_full_pipeline_walkforward.ipynb` / `scripts/05_backtest_full_pipeline_walkforward.py` | Walk-forward backtest that re-runs stock selection and allocation at every rebalance. |
+| 5 | `notebooks/05_backtest_full_pipeline_walkforward.ipynb` / `scripts/05_backtest_full_pipeline_walkforward.py` | Walk-forward backtest that re-runs stock selection and allocation at every rebalance, with selected-stock audit metadata and missing-return audit output. |
 | 6 | `notebooks/06_final_summary_report.ipynb` / `scripts/06_final_summary_report.py` | Build the final summary report, comparison tables, and charts. |
 
 ## External Data Sources
@@ -40,7 +40,7 @@ This project uses the current S&P 500 constituent universe as the stock universe
 
 | Model / Concept | What We Took | Our Implementation | Reference |
 |---|---|---|---|
-| Markowitz-style Mean-Volatility Optimization | Efficient-frontier idea and mean-risk tradeoff | MOSEK-style frontier: maximize `annual_return - delta * annual_volatility`; 10 log-spaced delta values over MOSEK's example range | https://docs.mosek.com/portfolio-cookbook/markowitz.html |
+| Markowitz-style Mean-Volatility Optimization | Efficient-frontier idea and mean-risk tradeoff | Maximize `annual_return - delta * annual_volatility`; Step 03 uses a 25-point dense frontier for presentation, while Steps 04-05 use a 10-point grid for walk-forward runtime | https://docs.mosek.com/portfolio-cookbook/markowitz.html |
 | Markowitz constraints | Budget and long-only style constraints, plus diversification limits | Sum weights = 1, long-only, max 10% per stock | https://docs.mosek.com/portfolio-cookbook/markowitz.html |
 | CVaR risk measure | Rockafellar-Uryasev style linear programming form using scenarios, VaR threshold, and tail excess variables | Minimize `CVaR(loss) - return_tradeoff * expected_return` with Bootstrap and Monte Carlo scenarios | https://docs.mosek.com/portfolio-cookbook/riskmeasures.html |
 | Risk Parity / Risk Budgeting | Equal risk contribution idea | Solve for weights whose normalized risk contributions are close to `1/N` | https://docs.mosek.com/portfolio-cookbook/risk_parity.html |
@@ -74,12 +74,15 @@ These values are not fixed by MOSEK, Wikipedia, FRED, Yahoo Finance, or the orig
 | Portfolio min weight | `0%` | Long-only portfolio; no short selling |
 | CVaR alpha | `95%` | Focus on worst 5% daily-return scenarios |
 | Number of scenarios | `3000` | Balance stability and runtime |
-| CVaR return tradeoff grid | `[0.1, 0.3, 1.0, 3.0, 10.0]` | Conservative-to-aggressive comparison |
-| Markowitz-style delta grid | `np.logspace(-1, 1.5, 10)[::-1]` | 10 values over the same range used in the MOSEK example |
+| CVaR return tradeoff grid for Step 03 frontier | `np.logspace(-2, 2, 25)` | Dense conservative-to-aggressive comparison for current allocation diagnostics |
+| CVaR return tradeoff in Steps 04-05 | `1.0` | Fixed walk-forward setting to avoid tuning leakage in the reported backtests |
+| Markowitz-style delta grid for Step 03 frontier | `np.logspace(-2, 2, 25)[::-1]` | Dense mean-volatility frontier for current allocation diagnostics |
+| Markowitz-style delta grid for Steps 04-05 | `np.logspace(-1, 1.5, 10)[::-1]` | Runtime-conscious grid used inside monthly walk-forward tests |
 | Markowitz-style headline representative | Max-training-Sharpe point from Markowitz-style frontier | Avoid presenting any single delta as theoretically fixed |
 | Training window for selection and allocation | Full available history, currently `2019-01-03` to `2026-05-01` | Keep Step 2 and Step 3 consistent |
 | Benchmark | `^GSPC` | S&P 500 price-index benchmark; may not be total-return equivalent to adjusted-close stock returns |
 | Random seed | `42` | Reproducibility for scenario generation |
+| Step 05 selection audit mode | `walk_forward_past_data_only` | Documents that each selected-stock record was selected using data available through its rebalance date |
 
 ## Backtest Setup
 
@@ -106,14 +109,16 @@ Step 4 is an allocation-only walk-forward backtest inspired by the original repo
 | `outputs/selected_stocks.csv` | Final 25 selected stocks after clustering and excess-Sharpe selection |
 | `outputs/stock_selection_risk_free_rate.csv` | Risk-free rate used in Step 2 Sharpe selection |
 | `outputs/risk_free_rate.csv` | Risk-free rate used in Step 3 portfolio metrics |
-| `outputs/portfolio_markowitz_frontier_summary.csv` | Main Markowitz-style Mean-Volatility Optimization result: 10 delta points on the efficient frontier |
+| `outputs/portfolio_markowitz_frontier_summary.csv` | Main Step 03 Markowitz-style Mean-Volatility Optimization result: 25 delta points on the current-allocation frontier |
 | `outputs/portfolio_weights_markowitz_best_sharpe_default.csv` | Representative Markowitz-style point used in the headline comparison |
-| `outputs/portfolio_cvar_frontier_summary.csv` | CVaR frontier points for Bootstrap and Monte Carlo scenarios |
+| `outputs/portfolio_cvar_frontier_summary.csv` | Step 03 CVaR frontier points for Bootstrap and Monte Carlo scenarios, including scenario type, risk metric, horizon, and portfolio type metadata |
 | `outputs/portfolio_allocation_summary.csv` | Headline comparison across portfolio allocation methods |
 | `outputs/portfolio_allocation_risk_return_scatter.png` | Step 3 risk-return view of the allocation methods |
 | `outputs/portfolio_allocation_metric_bars.png` | Step 3 metric dashboard: return, volatility, Sharpe, and CVaR |
 | `outputs/portfolio_top10_weights_by_method.png` | Step 3 top holdings for each allocation method |
-| `outputs/portfolio_risk_contribution_heatmap.png` | Step 3 risk contribution by ticker and method |
+| `outputs/portfolio_risk_contribution_heatmap.png` | Step 3 signed risk contribution by ticker and method |
+| `outputs/portfolio_absolute_risk_contribution_heatmap.png` | Step 3 absolute normalized risk contribution by ticker and method |
+| `outputs/portfolio_mean_cvar_frontier.png` | Step 3 direct Mean-CVaR frontier with scenario CVaR on the x-axis |
 | `outputs/portfolio_cvar_scenario_return_distributions.png` | Step 3 Bootstrap vs Monte Carlo scenario distributions for CVaR portfolios |
 | `outputs/backtest_metrics.csv` | Out-of-sample performance metrics for each allocation method and benchmark |
 | `outputs/backtest_equity_curves.csv` | Growth of 1.0 through the backtest period |
@@ -127,7 +132,7 @@ Step 4 is an allocation-only walk-forward backtest inspired by the original repo
 | `outputs/backtest_rolling_252d_return.png` | Step 4 rolling one-year return |
 | `outputs/backtest_rolling_252d_sharpe.png` | Step 4 rolling one-year Sharpe ratio |
 | `outputs/full_pipeline_metrics.csv` | Step 5 full-pipeline walk-forward performance metrics |
-| `outputs/full_pipeline_selected_stocks_history.csv` | Step 5 selected stocks at every rebalance date |
+| `outputs/full_pipeline_selected_stocks_history.csv` | Step 5 selected stocks at every rebalance date, including `train_start_date`, `train_end_date`, and `selection_mode` audit columns |
 | `outputs/full_pipeline_selection_frequency.csv` | Step 5 frequency of each stock being selected across rebalance dates |
 | `outputs/full_pipeline_selected_overlap.csv` | Step 5 month-to-month selection stability |
 | `outputs/full_pipeline_weights_history.csv` | Step 5 allocation weights after dynamic stock selection |
@@ -136,6 +141,7 @@ Step 4 is an allocation-only walk-forward backtest inspired by the original repo
 | `outputs/full_pipeline_calendar_year_return_details.csv` | Step 5 year-by-year period start/end markers, including whether the latest year is YTD/partial |
 | `outputs/full_pipeline_selected_stock_frequency.png` | Step 5 most frequently selected stocks |
 | `outputs/full_pipeline_selection_stability.png` | Step 5 stability of the selected 25-stock set over time |
+| `outputs/full_pipeline_missing_holding_returns.csv` | Step 5 audit table for missing realized holding-period returns; latest run has zero rows |
 
 ## Important Limitations
 

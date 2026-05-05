@@ -1,0 +1,26 @@
+ticker,weight,company_name,sector,sub_industry,cluster_id,sharpe_ratio
+COST,0.09999999999999938,Costco,Consumer Staples,Consumer Staples Merchandise Retail,3,1.0005629788573591
+CBOE,0.09999999999999938,Cboe Global Markets,Financials,Financial Exchanges & Data,8,0.6059014989809154
+KR,0.09999999999999938,Kroger,Consumer Staples,Food Retail,4,0.4310633509525201
+MCD,0.09999999999999938,McDonald's,Consumer Discretionary,Restaurants,6,0.2818477761279309
+NEM,0.09999999999999938,Newmont,Materials,Gold,11,0.4665195277131281
+EA,0.09999999999999938,Electronic Arts,Communication Services,Interactive Home Entertainment,20,0.3630337269751563
+SW,0.06466436708488175,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,15,0.1356713241946236
+PM,0.051974908316024006,Philip Morris International,Consumer Staples,Tobacco,1,0.6075251977941132
+PWR,0.04887414776353536,Quanta Services,Industrials,Construction & Engineering,16,1.4193912785946847
+LLY,0.047625664597231734,Lilly (Eli),Health Care,Pharmaceuticals,23,0.9759801128453782
+PGR,0.03822156062506456,Progressive Corporation,Financials,Property & Casualty Insurance,9,0.7058543130593218
+TMUS,0.03709204897232038,T-Mobile US,Communication Services,Wireless Telecommunication Services,7,0.4951035143012142
+MCK,0.03674851308486748,McKesson Corporation,Health Care,Health Care Distributors,22,0.9942387478882512
+TKO,0.03459226422486079,TKO Group Holdings,Communication Services,Movies & Entertainment,14,0.3026471975745246
+MRNA,0.021260848187978767,Moderna,Health Care,Biotechnology,18,0.1673093116614791
+IRM,0.018945677143238943,Iron Mountain,Real Estate,Other Specialized REITs,5,0.7308371708980332
+TGT,0.0,Target Corporation,Consumer Staples,Consumer Staples Merchandise Retail,2,0.2562734242626199
+HWM,0.0,Howmet Aerospace,Industrials,Aerospace & Defense,17,1.0833411154737191
+STX,0.0,Seagate Technology,Information Technology,"Technology Hardware, Storage & Peripherals",10,1.1929713180792945
+NVDA,0.0,Nvidia,Information Technology,Semiconductors,12,1.3940509605265778
+VRT,0.0,Vertiv,Industrials,Electrical Components & Equipment,13,1.0402618918020048
+STLD,0.0,Steel Dynamics,Materials,Steel,21,0.7375547761559569
+AAPL,0.0,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",19,0.9144976393461364
+MSI,0.0,Motorola Solutions,Information Technology,Communications Equipment,24,0.6745795362896225
+HCA,0.0,HCA Healthcare,Health Care,Health Care Facilities,25,0.4697923294082844

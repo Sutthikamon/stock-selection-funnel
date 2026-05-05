@@ -1,6 +1,6 @@
 # Data Leakage and Cross-Validation Audit
 
-Audit date: 2026-05-02
+Audit date: 2026-05-05
 
 Project files checked:
 
@@ -29,7 +29,7 @@ The remaining major limitation is constituent bias: the investable universe stil
 | Step 03 static allocation | Uses full available history | Not a backtest | Fine for "current allocation as of latest data", not for historical performance claims |
 | Step 04 allocation weights | Uses `train_returns = returns_selected.loc[:rebalance_date]` | Low | No future returns are used when computing weights inside each rebalance |
 | Step 04 realized performance | Uses only future holding returns after rebalance | Low | This is the correct out-of-sample measurement pattern |
-| Step 05 full-pipeline selection | Re-selects stocks every rebalance using only past returns | Low for selection leakage | This fixes the fixed-25-stock look-ahead issue from Step 04 |
+| Step 05 full-pipeline selection | Re-selects stocks every rebalance using only past returns | Low for selection leakage | This fixes the fixed-25-stock look-ahead issue from Step 04 and records selected-stock audit metadata |
 | Step 05 investable universe | Still uses current S&P 500 constituents | High for true historical S&P 500 claim | Requires point-in-time constituent data to fully fix |
 | Markowitz-style delta selection in Step 04 | Picks max training Sharpe each rebalance | Medium | Not future leakage, but can overfit because hyperparameter selection and model fitting use the same train sample |
 | CVaR tradeoff in Step 04 | Fixed at `1.0` | Low | No tuning leakage currently |
@@ -160,12 +160,15 @@ Current Step 05 behavior:
 - Rebalance count: `53`
 - Selects 25 stocks at every rebalance
 - Uses only returns up to each rebalance date for clustering, historical Sharpe ranking, and portfolio allocation
+- Writes `train_start_date`, `train_end_date`, and `selection_mode = walk_forward_past_data_only` into `full_pipeline_selected_stocks_history.csv`
+- Writes `full_pipeline_missing_holding_returns.csv` as a missing realized holding-period return audit file
 - Uses current S&P 500 constituents from Step 01, not point-in-time constituents
 
 Step 05 output interpretation:
 
 - `full_pipeline_metrics.csv` answers how the dynamic full workflow performed.
-- `full_pipeline_selected_stocks_history.csv` shows which stocks were selected at each rebalance.
+- `full_pipeline_selected_stocks_history.csv` shows which stocks were selected at each rebalance and includes the training window and selection mode for auditability.
+- `full_pipeline_missing_holding_returns.csv` records any missing realized holding-period returns; the latest run has zero rows.
 - `full_pipeline_selection_frequency.csv` shows which stocks were repeatedly selected.
 - `full_pipeline_selected_overlap.csv` shows selection stability over time.
 

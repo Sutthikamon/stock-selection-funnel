@@ -1,2 +1,2 @@
 source,series_id,description,observation_date,annual_rate_percent,annual_rate_decimal,daily_rate_decimal,as_of_returns_date,trading_days_per_year,lookback_mode,lookback_years,train_start_date,train_end_date,train_observations
-FRED,DGS3MO,3-Month Treasury Constant Maturity Rate,2026-04-30,3.68,0.0368,0.00014341919869242936,2026-05-01,252,full_history,all_available,2019-01-03,2026-05-01,1842
+FRED,DGS3MO,3-Month Treasury Constant Maturity Rate,2026-05-01,3.68,0.0368,0.00014341919869242936,2026-05-01,252,full_history,all_available,2019-01-03,2026-05-01,1842

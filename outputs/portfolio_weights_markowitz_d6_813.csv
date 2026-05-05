@@ -1,0 +1,26 @@
+ticker,weight,company_name,sector,sub_industry,cluster_id,sharpe_ratio
+KR,0.1,Kroger,Consumer Staples,Food Retail,4,0.4310633509525201
+CBOE,0.09999999999999999,Cboe Global Markets,Financials,Financial Exchanges & Data,8,0.6059014989809154
+COST,0.09999999999999999,Costco,Consumer Staples,Consumer Staples Merchandise Retail,3,1.0005629788573591
+EA,0.0802715942805676,Electronic Arts,Communication Services,Interactive Home Entertainment,20,0.3630337269751563
+PGR,0.07876600262752337,Progressive Corporation,Financials,Property & Casualty Insurance,9,0.7058543130593218
+NEM,0.07512204727895246,Newmont,Materials,Gold,11,0.4665195277131281
+MCK,0.07297559618982578,McKesson Corporation,Health Care,Health Care Distributors,22,0.9942387478882512
+MCD,0.0676958368333111,McDonald's,Consumer Discretionary,Restaurants,6,0.2818477761279309
+LLY,0.06459785198780915,Lilly (Eli),Health Care,Pharmaceuticals,23,0.9759801128453782
+SW,0.05589202417449425,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,15,0.1356713241946236
+PM,0.05221084952851628,Philip Morris International,Consumer Staples,Tobacco,1,0.6075251977941132
+PWR,0.045902593173349035,Quanta Services,Industrials,Construction & Engineering,16,1.4193912785946847
+STX,0.027605056787361068,Seagate Technology,Information Technology,"Technology Hardware, Storage & Peripherals",10,1.1929713180792945
+TMUS,0.025908049494742028,T-Mobile US,Communication Services,Wireless Telecommunication Services,7,0.4951035143012142
+MRNA,0.022110814249580675,Moderna,Health Care,Biotechnology,18,0.1673093116614791
+TKO,0.021093383828459066,TKO Group Holdings,Communication Services,Movies & Entertainment,14,0.3026471975745246
+VRT,0.009848299565508086,Vertiv,Industrials,Electrical Components & Equipment,13,1.0402618918020048
+TGT,4.845363740520618e-17,Target Corporation,Consumer Staples,Consumer Staples Merchandise Retail,2,0.2562734242626199
+STLD,4.6062712410227914e-17,Steel Dynamics,Materials,Steel,21,0.7375547761559569
+HCA,2.998686368660408e-17,HCA Healthcare,Health Care,Health Care Facilities,25,0.4697923294082844
+NVDA,2.177454424867275e-17,Nvidia,Information Technology,Semiconductors,12,1.3940509605265778
+AAPL,1.4512171865116575e-17,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",19,0.9144976393461364
+IRM,0.0,Iron Mountain,Real Estate,Other Specialized REITs,5,0.7308371708980332
+HWM,0.0,Howmet Aerospace,Industrials,Aerospace & Defense,17,1.0833411154737191
+MSI,0.0,Motorola Solutions,Information Technology,Communications Equipment,24,0.6745795362896225

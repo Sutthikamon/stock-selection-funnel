@@ -61,6 +61,7 @@ full_pipeline_config = pd.read_csv(OUTPUT_DIR / "full_pipeline_config.csv")
 selection_frequency = pd.read_csv(OUTPUT_DIR / "full_pipeline_selection_frequency.csv")
 selection_overlap = pd.read_csv(OUTPUT_DIR / "full_pipeline_selected_overlap.csv")
 selection_history = pd.read_csv(OUTPUT_DIR / "full_pipeline_selected_stocks_history.csv")
+missing_holding_returns = pd.read_csv(OUTPUT_DIR / "full_pipeline_missing_holding_returns.csv")
 annual_returns = pd.read_csv(OUTPUT_DIR / "full_pipeline_calendar_year_returns.csv")
 annual_return_details = pd.read_csv(OUTPUT_DIR / "full_pipeline_calendar_year_return_details.csv")
 
@@ -270,6 +271,7 @@ data_summary = pd.DataFrame(
         {"Item": "Full-pipeline last holding date", "Value": str(config.get("last_holding_date", ""))},
         {"Item": "Full-pipeline unique selected stocks", "Value": f"{selection_frequency.shape[0]:,}"},
         {"Item": "Average monthly selection overlap", "Value": num(selection_stability.mean(), 4)},
+        {"Item": "Missing holding-return audit rows", "Value": f"{len(missing_holding_returns):,}"},
     ]
 )
 
@@ -338,6 +340,17 @@ report_lines = [
     "",
     markdown_table(full_pipeline_table),
     "",
+    "## Step 05 Audit Outputs",
+    "",
+    "Step 05 exports `outputs/full_pipeline_selected_stocks_history.csv` with audit metadata for every selected-stock record:",
+    "",
+    "- `train_start_date`: first return date available in the expanding training window",
+    "- `train_end_date`: rebalance date used as the final training date",
+    "- `selection_mode`: `walk_forward_past_data_only`",
+    "",
+    "This metadata makes the selected-stock history easier to audit because each record states the data window used for selection. "
+    f"Step 05 also exports `outputs/full_pipeline_missing_holding_returns.csv` to audit missing realized holding-period returns. The latest run has {len(missing_holding_returns):,} missing-return audit rows.",
+    "",
     "## Step 04 vs Step 05: Leakage Impact",
     "",
     "Step 04 used the fixed 25 stocks selected with full-history information. Step 05 reselects stocks every rebalance using only past data. "
@@ -381,7 +394,7 @@ report_lines = [
     "### Methodology Limitations",
     "",
     "- Step 04 is intentionally allocation-only and uses the fixed 25 stocks from Step 02; it should not be used as the main historical strategy result.",
-    "- Step 05 fixes the fixed-stock look-ahead issue by reselecting each rebalance, but it still does not fix point-in-time S&P 500 membership bias.",
+    "- Step 05 fixes the fixed-stock look-ahead issue by reselecting each rebalance and records `train_start_date`, `train_end_date`, and `selection_mode` in the selected-stock history, but it still does not fix point-in-time S&P 500 membership bias.",
     "- The within-cluster stock selection uses historical Sharpe ratio as a backward-looking ranking heuristic, not as a predictive model of future returns. High past Sharpe may not persist out of sample.",
     "- The clustering distance uses 1 minus Spearman correlation as a practical similarity-to-distance transformation. Alternative correlation-distance definitions such as `sqrt(2*(1-rho))` could be tested in future robustness checks.",
     "- The number of clusters is fixed at 25 as a design choice. Different cluster counts may lead to different diversification and performance results. Future work should test sensitivity across multiple cluster counts such as 15, 20, 25, and 30.",
@@ -435,6 +448,8 @@ report_lines = [
     "- `outputs/final_selection_stability_and_turnover.png`",
     "- `outputs/full_pipeline_equity_curves.png`",
     "- `outputs/full_pipeline_relative_wealth_vs_benchmark.png`",
+    "- `outputs/portfolio_mean_cvar_frontier.png`",
+    "- `outputs/portfolio_absolute_risk_contribution_heatmap.png`",
     "",
 ]
 

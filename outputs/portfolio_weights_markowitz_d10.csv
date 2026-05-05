@@ -1,0 +1,26 @@
+ticker,weight,company_name,sector,sub_industry,cluster_id,sharpe_ratio
+COST,0.09999999999761709,Costco,Consumer Staples,Consumer Staples Merchandise Retail,3,1.0005629788573591
+KR,0.09999999999761706,Kroger,Consumer Staples,Food Retail,4,0.4310633509525201
+CBOE,0.09999999999761704,Cboe Global Markets,Financials,Financial Exchanges & Data,8,0.6059014989809154
+MCD,0.09804503025915436,McDonald's,Consumer Discretionary,Restaurants,6,0.2818477761279309
+EA,0.08756429449331249,Electronic Arts,Communication Services,Interactive Home Entertainment,20,0.3630337269751563
+PGR,0.07653204761742549,Progressive Corporation,Financials,Property & Casualty Insurance,9,0.7058543130593218
+NEM,0.0749213073428842,Newmont,Materials,Gold,11,0.4665195277131281
+MCK,0.06205611824929371,McKesson Corporation,Health Care,Health Care Distributors,22,0.9942387478882512
+SW,0.05876138124717536,Smurfit Westrock,Materials,Paper & Plastic Packaging Products & Materials,15,0.1356713241946236
+LLY,0.05710473700385784,Lilly (Eli),Health Care,Pharmaceuticals,23,0.9759801128453782
+PM,0.05320492781318576,Philip Morris International,Consumer Staples,Tobacco,1,0.6075251977941132
+PWR,0.03427584331214098,Quanta Services,Industrials,Construction & Engineering,16,1.4193912785946847
+TMUS,0.02863529782654558,T-Mobile US,Communication Services,Wireless Telecommunication Services,7,0.4951035143012142
+TKO,0.024347825330099,TKO Group Holdings,Communication Services,Movies & Entertainment,14,0.3026471975745246
+MRNA,0.021520246635924722,Moderna,Health Care,Biotechnology,18,0.1673093116614791
+STX,0.019652152266007174,Seagate Technology,Information Technology,"Technology Hardware, Storage & Peripherals",10,1.1929713180792945
+VRT,0.003378790610141832,Vertiv,Industrials,Electrical Components & Equipment,13,1.0402618918020048
+STLD,6.058772816521006e-17,Steel Dynamics,Materials,Steel,21,0.7375547761559569
+MSI,4.996746229104403e-17,Motorola Solutions,Information Technology,Communications Equipment,24,0.6745795362896225
+HWM,4.7611264019607284e-17,Howmet Aerospace,Industrials,Aerospace & Defense,17,1.0833411154737191
+IRM,4.1359329897121875e-17,Iron Mountain,Real Estate,Other Specialized REITs,5,0.7308371708980332
+NVDA,4.1205604290707117e-17,Nvidia,Information Technology,Semiconductors,12,1.3940509605265778
+AAPL,3.973451816544765e-17,Apple Inc.,Information Technology,"Technology Hardware, Storage & Peripherals",19,0.9144976393461364
+TGT,3.1079352283687576e-17,Target Corporation,Consumer Staples,Consumer Staples Merchandise Retail,2,0.2562734242626199
+HCA,2.9277838388669923e-18,HCA Healthcare,Health Care,Health Care Facilities,25,0.4697923294082844

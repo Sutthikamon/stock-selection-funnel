@@ -29,6 +29,7 @@ Important limitation: Step 05 fixes the major look-ahead issue from using one fi
 | Full-pipeline last holding date      | 2026-05-01               |
 | Full-pipeline unique selected stocks | 114                      |
 | Average monthly selection overlap    | 0.6075                   |
+| Missing holding-return audit rows     | 0                        |
 
 ## Workflow Summary
 
@@ -52,6 +53,16 @@ Important limitation: Step 05 fixes the major look-ahead issue from using one fi
 | CVaR Bootstrap     | 1.6721      | 12.63% | 0.6357 | -20.64%      | 13.91%     | 34.89    |
 | CVaR Monte Carlo   | 1.5025      | 9.87%  | 0.4644 | -23.67%      | 13.60%     | 32.20    |
 | S&P 500            | 1.5231      | 10.22% | 0.4127 | -25.43%      | 17.55%     | 0.00     |
+
+## Step 05 Audit Outputs
+
+Step 05 exports `outputs/full_pipeline_selected_stocks_history.csv` with audit metadata for every selected-stock record:
+
+- `train_start_date`: first return date available in the expanding training window
+- `train_end_date`: rebalance date used as the final training date
+- `selection_mode`: `walk_forward_past_data_only`
+
+This metadata makes the selected-stock history easier to audit because each record states the data window used for selection. Step 05 also exports `outputs/full_pipeline_missing_holding_returns.csv` to audit missing realized holding-period returns. The latest run has zero missing-return audit rows.
 
 ## Step 04 vs Step 05: Leakage Impact
 
@@ -144,7 +155,7 @@ These are useful for the current allocation view, but should not be treated as a
 ### Methodology Limitations
 
 - Step 04 is intentionally allocation-only and uses the fixed 25 stocks from Step 02; it should not be used as the main historical strategy result.
-- Step 05 fixes the fixed-stock look-ahead issue by reselecting each rebalance, but it still does not fix point-in-time S&P 500 membership bias.
+- Step 05 fixes the fixed-stock look-ahead issue by reselecting each rebalance and now records `train_start_date`, `train_end_date`, and `selection_mode` in the selected-stock history, but it still does not fix point-in-time S&P 500 membership bias.
 - The within-cluster stock selection uses historical Sharpe ratio as a backward-looking ranking heuristic, not as a predictive model of future returns. High past Sharpe may not persist out of sample.
 - The clustering distance uses 1 minus Spearman correlation as a practical similarity-to-distance transformation. Alternative correlation-distance definitions such as `sqrt(2*(1-rho))` could be tested in future robustness checks.
 - The number of clusters is fixed at 25 as a design choice. Different cluster counts may lead to different diversification and performance results. Future work should test sensitivity across multiple cluster counts such as 15, 20, 25, and 30.
@@ -198,3 +209,5 @@ These are useful for the current allocation view, but should not be treated as a
 - `outputs/final_selection_stability_and_turnover.png`
 - `outputs/full_pipeline_equity_curves.png`
 - `outputs/full_pipeline_relative_wealth_vs_benchmark.png`
+- `outputs/portfolio_mean_cvar_frontier.png`
+- `outputs/portfolio_absolute_risk_contribution_heatmap.png`
