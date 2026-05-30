@@ -1,6 +1,6 @@
 # Data Leakage and Cross-Validation Audit
 
-Audit date: 2026-05-05
+Audit date: 2026-05-31
 
 Project files checked:
 
@@ -11,6 +11,8 @@ Project files checked:
 - `scripts/04_backtest_allocation_only.py`
 - `notebooks/05_backtest_full_pipeline_walkforward.ipynb`
 - `scripts/05_backtest_full_pipeline_walkforward.py`
+- `notebooks/06_final_summary_report.ipynb`
+- `scripts/06_final_summary_report.py`
 
 ## Executive Summary
 
@@ -33,7 +35,7 @@ The remaining major limitation is constituent bias: the investable universe stil
 | Step 05 investable universe | Still uses current S&P 500 constituents | High for true historical S&P 500 claim | Requires point-in-time constituent data to fully fix |
 | Markowitz-style delta selection in Step 04 | Picks max training Sharpe each rebalance | Medium | Not future leakage, but can overfit because hyperparameter selection and model fitting use the same train sample |
 | CVaR tradeoff in Step 04 | Fixed at `1.0` | Low | No tuning leakage currently |
-| Risk-free rate in Step 04 | Historical FRED `DGS3MO` aligned by date | Low/Medium | Good enough for research; for strict tradable tests, lag by one business day to account for publication timing |
+| Risk-free rate in Steps 04-05 | Historical FRED `DGS3MO` aligned by date, with fallback to the saved Step 03 risk-free rate | Low/Medium | Good enough for research; for strict tradable tests, lag by one business day to account for publication timing |
 | Dropping rows with selected-stock NaNs | Uses the fixed selected universe | Medium if delistings appear later | With current selected stocks all have full observations, but this can hide future availability issues in broader tests |
 
 ## What Is Currently Safe
@@ -52,15 +54,15 @@ Reason:
 - Every rebalance uses only data up to the rebalance date
 - Portfolio performance is measured with realized returns after the rebalance date
 
-## What Is Not Yet Safe
+## What Step 04 Is Not Safe For
 
-The current backtest is not safe for this stronger claim:
+The Step 04 allocation-only backtest is not safe for this stronger claim:
 
 > The full stock-selection plus allocation strategy would have produced these historical returns.
 
 Reason:
 
-- The 25 stocks were selected once using full history through `2026-05-01`.
+- Step 04 uses the fixed 25 stocks selected once with full history through `2026-05-01`.
 - A true backtest starting on `2022-01-03` could not know the full 2022-2026 historical Sharpe rankings.
 - The S&P 500 universe is the current Wikipedia list, not point-in-time historical constituents.
 
@@ -68,7 +70,7 @@ After adding Step 05, this stronger claim becomes closer but still needs careful
 
 > The full workflow worked on current S&P 500 constituents under walk-forward selection.
 
-It still should not be described as a true historical S&P 500 constituent backtest unless point-in-time constituents are added.
+Step 05 should be used as the main historical evaluation of the full workflow. It still should not be described as a true historical S&P 500 constituent backtest unless point-in-time constituents are added.
 
 ## Recommended Cross-Validation Design
 

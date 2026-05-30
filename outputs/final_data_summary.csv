@@ -10,3 +10,4 @@ Full-pipeline first holding date,2022-01-03
 Full-pipeline last holding date,2026-05-01
 Full-pipeline unique selected stocks,114
 Average monthly selection overlap,0.6075
+Missing holding-return audit rows,0

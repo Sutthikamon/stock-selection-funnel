@@ -1,6 +1,6 @@
 # References and Assumptions
 
-Last updated: 2026-05-05
+Last updated: 2026-05-31
 
 This file records where each part of the S&P 500 stock-selection and portfolio-allocation workflow came from, and which values are project assumptions rather than external defaults.
 
@@ -21,8 +21,10 @@ This file records where each part of the S&P 500 stock-selection and portfolio-a
 |---|---|---|---|
 | Wikipedia list of S&P 500 companies | Current S&P 500 universe, sectors, sub-industries, ticker symbols | `notebooks/01_prepare_sp500_data.ipynb` | https://en.wikipedia.org/wiki/List_of_S%26P_500_companies |
 | Yahoo Finance data through `yfinance` | Adjusted close prices, close prices, volume, benchmark price data | `notebooks/01_prepare_sp500_data.ipynb` | https://pypi.org/project/yfinance/ |
-| FRED `DGS3MO` | Real short-term U.S. Treasury proxy for risk-free rate | `notebooks/02_select_stocks_clustering_mst.ipynb`, `notebooks/03_allocate_portfolios.ipynb` | https://fred.stlouisfed.org/series/DGS3MO |
+| FRED `DGS3MO` | Short-term U.S. Treasury yield proxy for risk-free rate and historical walk-forward Sharpe metrics | Steps 02-05 notebooks and Step 04-05 scripts | https://fred.stlouisfed.org/series/DGS3MO |
 | Yahoo Finance `^IRX` chart endpoint | Fallback risk-free proxy if FRED fetch fails | `notebooks/02_select_stocks_clustering_mst.ipynb`, `notebooks/03_allocate_portfolios.ipynb` | https://finance.yahoo.com/quote/%5EIRX/ |
+
+`yfinance` is an open-source wrapper for Yahoo Finance data and is used here for research and educational data access. It is not an official Yahoo data vendor, and Yahoo Finance data availability, terms, and adjustment methodology can change over time.
 
 ## Source Repository Reference
 
@@ -44,6 +46,7 @@ This project uses the current S&P 500 constituent universe as the stock universe
 | Markowitz constraints | Budget and long-only style constraints, plus diversification limits | Sum weights = 1, long-only, max 10% per stock | https://docs.mosek.com/portfolio-cookbook/markowitz.html |
 | CVaR risk measure | Rockafellar-Uryasev style linear programming form using scenarios, VaR threshold, and tail excess variables | Minimize `CVaR(loss) - return_tradeoff * expected_return` with Bootstrap and Monte Carlo scenarios | https://docs.mosek.com/portfolio-cookbook/riskmeasures.html |
 | Risk Parity / Risk Budgeting | Equal risk contribution idea | Solve for weights whose normalized risk contributions are close to `1/N` | https://docs.mosek.com/portfolio-cookbook/risk_parity.html |
+| SciPy constrained optimization | Local numerical optimizer used to solve portfolio objectives with bounds and constraints | Use `scipy.optimize.minimize` instead of a commercial solver so the notebooks remain reproducible in a standard Python environment | https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.minimize.html |
 | Bootstrap scenarios | Resampling observations with replacement | Sample whole historical daily-return rows to preserve cross-asset co-movement | https://en.wikipedia.org/wiki/Bootstrapping_(statistics) |
 | Monte Carlo scenarios | Random simulation from an assumed distribution | Sample daily stock-return vectors from multivariate normal fitted to historical mean/covariance | https://en.wikipedia.org/wiki/Monte_Carlo_method |
 
@@ -79,14 +82,17 @@ These values are not fixed by MOSEK, Wikipedia, FRED, Yahoo Finance, or the orig
 | Markowitz-style delta grid for Step 03 frontier | `np.logspace(-2, 2, 25)[::-1]` | Dense mean-volatility frontier for current allocation diagnostics |
 | Markowitz-style delta grid for Steps 04-05 | `np.logspace(-1, 1.5, 10)[::-1]` | Runtime-conscious grid used inside monthly walk-forward tests |
 | Markowitz-style headline representative | Max-training-Sharpe point from Markowitz-style frontier | Avoid presenting any single delta as theoretically fixed |
-| Training window for selection and allocation | Full available history, currently `2019-01-03` to `2026-05-01` | Keep Step 2 and Step 3 consistent |
+| Training window for Step 02-03 static analysis | Full available history, currently `2019-01-03` to `2026-05-01` | Keep the current stock-selection and current-allocation diagnostics consistent |
+| Training window for Step 04-05 walk-forward tests | Expanding history through each rebalance date | Avoid direct look-ahead by fitting selection and allocation decisions only on data available at that rebalance |
 | Benchmark | `^GSPC` | S&P 500 price-index benchmark; may not be total-return equivalent to adjusted-close stock returns |
 | Random seed | `42` | Reproducibility for scenario generation |
 | Step 05 selection audit mode | `walk_forward_past_data_only` | Documents that each selected-stock record was selected using data available through its rebalance date |
 
 ## Backtest Setup
 
-Step 4 is an allocation-only walk-forward backtest inspired by the original repo's custom `algo.backtest()` flow.
+### Step 04 Allocation-Only Setup
+
+Step 04 is an allocation-only walk-forward backtest inspired by the original repo's custom `algo.backtest()` flow.
 
 | Item | Current Setting | Notes |
 |---|---:|---|
@@ -101,6 +107,23 @@ Step 4 is an allocation-only walk-forward backtest inspired by the original repo
 | Realized performance data | Actual daily returns only | Scenarios are not used to simulate realized performance |
 | CVaR Bootstrap scenarios | Historical daily-return rows sampled with replacement | Used only to optimize CVaR weights |
 | CVaR Monte Carlo scenarios | Multivariate normal scenarios fitted from historical mean/covariance | Used only to optimize CVaR weights; this assumption may underestimate fat tails, skewness, and regime shifts |
+
+### Step 05 Full-Pipeline Setup
+
+| Item | Current Setting | Notes |
+|---|---:|---|
+| Backtest file | `notebooks/05_backtest_full_pipeline_walkforward.ipynb` / `scripts/05_backtest_full_pipeline_walkforward.py` | Main historical evaluation for the full workflow |
+| Universe | Current S&P 500 constituents from Step 01 | Still not point-in-time historical membership |
+| First rebalance date | `2021-12-31` | First date with at least 756 prior trading observations |
+| First holding date | `2022-01-03` | First out-of-sample return date |
+| Last holding date | `2026-05-01` | Latest available return date in the current dataset |
+| Rebalance count | `53` | Monthly rebalances across the holding window |
+| Rebalance frequency | Month-end trading day | Re-runs selection and allocation at each rebalance |
+| Training window | Expanding window | Each rebalance uses only data available up to that rebalance date |
+| Stock selection | Spearman clustering plus historical Sharpe ranking | Recomputed at every rebalance using past data only |
+| Allocation models | Six allocation methods | Recomputed at every rebalance using the selected stocks and past data only |
+| Transaction cost | `0.001` | Simple proportional turnover cost |
+| Risk-free rate | Historical FRED `DGS3MO`, with saved Step 03 fallback | Used for training Sharpe, portfolio training metrics, and realized Sharpe calculations |
 
 ## Current Output Interpretation
 
@@ -136,12 +159,20 @@ Step 4 is an allocation-only walk-forward backtest inspired by the original repo
 | `outputs/full_pipeline_selection_frequency.csv` | Step 5 frequency of each stock being selected across rebalance dates |
 | `outputs/full_pipeline_selected_overlap.csv` | Step 5 month-to-month selection stability |
 | `outputs/full_pipeline_weights_history.csv` | Step 5 allocation weights after dynamic stock selection |
+| `outputs/full_pipeline_turnover.csv` | Step 5 turnover and transaction-cost records for each rebalance |
 | `outputs/full_pipeline_equity_curves.png` | Step 5 growth of 1.0 for the full pipeline |
 | `outputs/full_pipeline_relative_wealth_vs_benchmark.png` | Step 5 portfolio value divided by S&P 500 benchmark value |
+| `outputs/full_pipeline_risk_return_scatter.png` | Step 5 realized risk-return comparison across allocation methods and benchmark |
+| `outputs/full_pipeline_metric_dashboard.png` | Step 5 final-value, CAGR, Sharpe, and drawdown dashboard |
 | `outputs/full_pipeline_calendar_year_return_details.csv` | Step 5 year-by-year period start/end markers, including whether the latest year is YTD/partial |
 | `outputs/full_pipeline_selected_stock_frequency.png` | Step 5 most frequently selected stocks |
 | `outputs/full_pipeline_selection_stability.png` | Step 5 stability of the selected 25-stock set over time |
 | `outputs/full_pipeline_missing_holding_returns.csv` | Step 5 audit table for missing realized holding-period returns; latest run has zero rows |
+| `docs/final_summary_report.md` | Step 6 generated final narrative report |
+| `outputs/final_data_summary.csv` | Step 6 compact data summary table |
+| `outputs/final_full_pipeline_metrics_table.csv` | Step 6 formatted full-pipeline metrics table |
+| `outputs/final_04_vs_05_cagr_table.csv` | Step 6 formatted allocation-only vs full-pipeline CAGR comparison |
+| `outputs/final_output_manifest.csv` | Step 6 manifest checking that final report tables and charts exist |
 
 ## Important Limitations
 

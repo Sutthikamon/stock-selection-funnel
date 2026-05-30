@@ -1,5 +1,5 @@
 # %% [markdown]
-# # 04 Backtest / Evaluation
+# # 4. Allocation-Only Walk-Forward Backtest
 #
 # This notebook-style script tests the portfolio allocation methods out of sample.
 #
@@ -11,6 +11,24 @@
 # - Bootstrap and Monte Carlo scenarios are used only inside the CVaR optimizers, not to simulate performance.
 # - It compares allocation methods only; it does not test whether the fixed Step 02 selected-stock list
 #   could have been known historically without look-ahead.
+
+# %% [markdown]
+# ## Workflow
+#
+# 1. Configure paths, backtest assumptions, allocation constraints, and method order.
+# 2. Load Step 01 returns, Step 02 selected stocks, and benchmark returns.
+# 3. Build the daily risk-free rate series used for Sharpe and Sortino metrics.
+# 4. Define shared portfolio helpers and allocation model functions.
+# 5. Define the walk-forward backtest engine.
+# 6. Run the allocation-only backtest using an expanding training window.
+# 7. Evaluate realized performance and save output tables.
+# 8. Build core and diagnostic charts.
+# 9. Review the output manifest.
+
+# %% [markdown]
+# ## 1. Setup and Configuration
+#
+# Set project paths, backtest assumptions, allocation constraints, optimizer grids, scenario settings, method order, and benchmark naming.
 
 # %%
 from pathlib import Path
@@ -84,15 +102,15 @@ print(f"Project root: {PROJECT_ROOT}")
 print(f"Outputs will be written to: {OUTPUT_DIR}")
 
 # %% [markdown]
-# ## Load Real Project Data
+# ## 2. Load Step 01/02 Data
 #
-# The backtest uses existing real files from steps 01 and 02:
+# The allocation-only backtest uses these existing files:
 #
 # - `data/returns_matrix.parquet`
 # - `data/benchmark_returns.parquet`
 # - `outputs/selected_stocks.csv`
 #
-# The selected 25 stocks are fixed in this file so that the test focuses on allocation models.
+# The selected 25 stocks are fixed in this notebook so that the test focuses on allocation models, not stock selection.
 
 # %%
 def estimate_trading_days_per_year(index: pd.Index) -> int:
@@ -137,10 +155,9 @@ if len(returns_selected) <= MIN_TRAINING_DAYS:
     raise ValueError("Not enough data to create an out-of-sample backtest after the minimum training window.")
 
 # %% [markdown]
-# ## Risk-Free Rate For Metrics
+# ## 3. Risk-Free Rate Series
 #
-# The script tries to fetch historical FRED `DGS3MO` rates. If that is unavailable, it falls back to the
-# real risk-free rate already saved by step 03 in `outputs/risk_free_rate.csv`.
+# The notebook tries to fetch historical FRED `DGS3MO` rates. If that is unavailable, it falls back to the risk-free rate already saved by Step 03 in `outputs/risk_free_rate.csv`.
 
 # %%
 def fetch_fred_dgs3mo_history(start_date, end_date):
@@ -219,7 +236,9 @@ print("Risk-free source used:", risk_free["source"].iloc[0], risk_free["series_i
 print("Risk-free annual range:", risk_free["annual_rate_decimal"].min(), "to", risk_free["annual_rate_decimal"].max())
 
 # %% [markdown]
-# ## Allocation Helpers
+# ## 4. Shared Backtest Helpers
+#
+# These helpers annualize returns/covariance, enforce weight bounds, compute in-sample training metrics, and label Markowitz frontier points.
 
 # %%
 def annualized_mean(returns: pd.DataFrame) -> pd.Series:
@@ -290,7 +309,12 @@ def delta_label(value):
     return f"d{value:.4g}".replace(".", "_")
 
 # %% [markdown]
-# ## Allocation Models
+# ## 5. Allocation Model Functions
+#
+# Define the allocation methods used inside each rebalance. These functions only use the training window passed into them.
+
+# %% [markdown]
+# ### 5.1 Baseline Allocation Functions
 
 # %%
 def allocate_equal_weight(returns: pd.DataFrame):
@@ -304,7 +328,10 @@ def allocate_inverse_volatility(returns: pd.DataFrame):
     inv_vol = inv_vol.replace([np.inf, -np.inf], np.nan).fillna(0)
     return cap_and_redistribute(inv_vol.to_numpy())
 
+# %% [markdown]
+# ### 5.2 Markowitz-Style Mean-Volatility Allocation
 
+# %%
 def allocate_markowitz(returns: pd.DataFrame, delta: float):
     mu = annualized_mean(returns).to_numpy()
     cov = annualized_cov(returns).to_numpy()
@@ -331,7 +358,10 @@ def allocate_markowitz(returns: pd.DataFrame, delta: float):
         return allocate_equal_weight(returns)
     return cap_and_redistribute(result.x)
 
+# %% [markdown]
+# ### 5.3 Risk Parity Allocation
 
+# %%
 def allocate_risk_parity(returns: pd.DataFrame):
     cov = annualized_cov(returns).to_numpy()
     n = cov.shape[0]
@@ -365,7 +395,10 @@ def allocate_risk_parity(returns: pd.DataFrame):
         return allocate_inverse_volatility(returns)
     return cap_and_redistribute(result.x)
 
+# %% [markdown]
+# ### 5.4 CVaR Scenario Generators
 
+# %%
 def generate_bootstrap_scenarios(returns: pd.DataFrame, n_scenarios=N_SCENARIOS, seed=RANDOM_SEED):
     rng = np.random.default_rng(seed)
     values = returns.to_numpy()
@@ -379,7 +412,10 @@ def generate_monte_carlo_scenarios(returns: pd.DataFrame, n_scenarios=N_SCENARIO
     cov = returns.cov().to_numpy() + np.eye(returns.shape[1]) * 1e-10
     return rng.multivariate_normal(mean=mu, cov=cov, size=n_scenarios)
 
+# %% [markdown]
+# ### 5.5 CVaR Allocation
 
+# %%
 def allocate_cvar(scenarios: np.ndarray, fallback_returns: pd.DataFrame, alpha=CVAR_ALPHA, return_tradeoff=CVAR_RETURN_TRADEOFF):
     scenarios = np.asarray(scenarios, dtype=float)
     n_scenarios, n_assets = scenarios.shape
@@ -418,7 +454,12 @@ def allocate_cvar(scenarios: np.ndarray, fallback_returns: pd.DataFrame, alpha=C
     return cap_and_redistribute(result.x[:n_assets])
 
 # %% [markdown]
-# ## Backtest Engine
+# ## 6. Backtest Engine Helpers
+#
+# Create the rebalance calendar, compute target weights at each rebalance, and define portfolio drift after realized returns.
+
+# %% [markdown]
+# ### 6.1 Month-End Rebalance Calendar
 
 # %%
 def make_month_end_rebalance_dates(index: pd.Index, min_training_days: int):
@@ -431,7 +472,10 @@ def make_month_end_rebalance_dates(index: pd.Index, min_training_days: int):
         raise ValueError("Not enough rebalance dates after applying the minimum training window.")
     return rebalance_dates
 
+# %% [markdown]
+# ### 6.2 Rebalance Weight Computation
 
+# %%
 def compute_rebalance_weights(train_returns: pd.DataFrame, rebalance_date: pd.Timestamp, period_number: int):
     annual_rf = float(risk_free.loc[rebalance_date, "annual_rate_decimal"])
 
@@ -490,7 +534,10 @@ def compute_rebalance_weights(train_returns: pd.DataFrame, rebalance_date: pd.Ti
 
     return weights, frontier
 
+# %% [markdown]
+# ### 6.3 Weight Drift After Daily Returns
 
+# %%
 def update_drifted_weights(weights: np.ndarray, asset_returns: np.ndarray):
     gross_return = float(weights @ asset_returns)
     denom = 1.0 + gross_return
@@ -504,7 +551,12 @@ def update_drifted_weights(weights: np.ndarray, asset_returns: np.ndarray):
         new_weights = new_weights / new_weights.sum()
     return new_weights, gross_return
 
+# %% [markdown]
+# ## 7. Run Allocation-Only Walk-Forward Backtest
+#
+# At each rebalance, fit allocation weights using returns available through that date, apply transaction cost, hold until the next rebalance, and record realized returns.
 
+# %%
 def run_backtest():
     rebalance_dates = make_month_end_rebalance_dates(returns_selected.index, MIN_TRAINING_DAYS)
     first_rebalance_date = rebalance_dates[0]
@@ -621,7 +673,7 @@ def run_backtest():
     }
     return daily_returns, equity_curves, turnover, weights_history, markowitz_frontier_history, metadata
 
-
+# %%
 daily_returns, equity_curves, turnover, weights_history, markowitz_frontier_history, backtest_meta = run_backtest()
 
 print("First rebalance date:", backtest_meta["first_rebalance_date"].date())
@@ -630,7 +682,10 @@ print("Last holding date:", backtest_meta["last_holding_date"].date())
 print("Rebalance count:", backtest_meta["rebalance_count"])
 
 # %% [markdown]
-# ## Evaluate Backtest Performance
+# ## 8. Evaluate Backtest Performance
+
+# %% [markdown]
+# ### 8.1 Performance Metric Helpers
 
 # %%
 def max_drawdown(equity_curve: pd.Series):
@@ -708,7 +763,10 @@ def summarize_performance(daily_returns: pd.DataFrame, equity_curves: pd.DataFra
 
     return pd.DataFrame(rows).set_index("method")
 
+# %% [markdown]
+# ### 8.2 Compute Metrics and Drawdowns
 
+# %%
 drawdowns = equity_curves.apply(lambda col: col / col.cummax() - 1.0)
 metrics = summarize_performance(daily_returns, equity_curves, turnover)
 
@@ -721,7 +779,7 @@ except NameError:
     print(metrics_display)
 
 # %% [markdown]
-# ## Save Outputs
+# ## 9. Save Outputs and Config
 
 # %%
 daily_returns.to_csv(OUTPUT_DIR / "backtest_daily_returns.csv")
@@ -758,11 +816,37 @@ config_rows = [
 ]
 pd.DataFrame(config_rows, columns=["setting", "value"]).to_csv(OUTPUT_DIR / "backtest_config.csv", index=False)
 
+core_output_files = [
+    "backtest_daily_returns.csv",
+    "backtest_equity_curves.csv",
+    "backtest_drawdowns.csv",
+    "backtest_metrics.csv",
+    "backtest_turnover.csv",
+    "backtest_weights_history.csv",
+    "backtest_markowitz_frontier_history.csv",
+    "backtest_config.csv",
+    "backtest_risk_free_rates.csv",
+]
+
+backtest_output_manifest = pd.DataFrame({
+    "file": core_output_files,
+    "exists": [(OUTPUT_DIR / file).exists() for file in core_output_files],
+    "size_bytes": [
+        (OUTPUT_DIR / file).stat().st_size if (OUTPUT_DIR / file).exists() else np.nan
+        for file in core_output_files
+    ],
+})
+
 print("Saved backtest outputs to:", OUTPUT_DIR)
 print(metrics[["final_value", "cagr", "annualized_volatility", "sharpe_ratio", "max_drawdown"]].round(4))
 
 # %% [markdown]
-# ## Charts
+# ## 10. Core Backtest Charts
+
+# %% [markdown]
+# ### 10.1 Chart Setup
+#
+# These charts are interpretation checks after the allocation-only backtest metrics have been calculated.
 
 # %%
 plt.style.use("seaborn-v0_8-whitegrid")
@@ -780,16 +864,22 @@ def short_method_name(method):
         "equal": "Equal",
         "inverse_volatility": "Inv Vol",
         "risk_parity": "Risk Parity",
-        "markowitz_best_sharpe_default": "Markowitz-style Mean-Volatility",
+        "markowitz_best_sharpe_default": "Mean-Vol",
         "cvar_bootstrap": "CVaR Boot",
         "cvar_montecarlo": "CVaR MC",
         BENCHMARK_NAME: "S&P 500",
     }.get(method, method)
 
 
+plot_methods = list(METHOD_ORDER) + [BENCHMARK_NAME]
+
+# %% [markdown]
+# ### 10.2 Equity Curves
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 7))
-for col in list(METHOD_ORDER) + [BENCHMARK_NAME]:
-    ax.plot(equity_curves.index, equity_curves[col], label=col, linewidth=1.7)
+for col in plot_methods:
+    ax.plot(equity_curves.index, equity_curves[col], label=short_method_name(col), linewidth=1.7)
 ax.set_title("Backtest Equity Curves")
 ax.set_ylabel("Growth of $1")
 ax.legend(loc="upper left", ncol=2)
@@ -797,9 +887,13 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_equity_curves.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 10.3 Drawdowns
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 7))
-for col in list(METHOD_ORDER) + [BENCHMARK_NAME]:
-    ax.plot(drawdowns.index, drawdowns[col], label=col, linewidth=1.4)
+for col in plot_methods:
+    ax.plot(drawdowns.index, drawdowns[col], label=short_method_name(col), linewidth=1.4)
 ax.set_title("Backtest Drawdowns")
 ax.set_ylabel("Drawdown")
 ax.legend(loc="lower left", ncol=2)
@@ -807,6 +901,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_drawdowns.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 10.4 Turnover
+
+# %%
 fig, ax = plt.subplots(figsize=(10, 5))
 metrics.loc[METHOD_ORDER, "average_turnover_per_rebalance"].plot(kind="bar", ax=ax, color="#4C78A8")
 ax.set_title("Average Turnover per Rebalance")
@@ -816,14 +914,17 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_turnover.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 10.5 Weights Over Time
 
+# %%
 def plot_weights_over_time(method: str):
     method_weights = weights_history[weights_history["method"] == method]
     pivot = method_weights.pivot(index="rebalance_date", columns="ticker", values="weight").fillna(0.0)
     top = pivot.mean().sort_values(ascending=False).head(10).index
     fig, ax = plt.subplots(figsize=(12, 6))
     pivot[top].plot.area(ax=ax, linewidth=0)
-    ax.set_title(f"Top Average Weights Over Time: {method}")
+    ax.set_title(f"Top Average Weights Over Time: {short_method_name(method)}")
     ax.set_ylabel("Weight")
     ax.legend(loc="upper left", ncol=2)
     fig.tight_layout()
@@ -838,13 +939,14 @@ for method in METHOD_ORDER:
 print("Saved backtest charts.")
 
 # %% [markdown]
-# ## Additional Backtest Diagnostic Charts
+# ## 11. Diagnostic Backtest Charts
 #
 # These charts help explain how each allocation behaves through time, not just the final score.
 
+# %% [markdown]
+# ### 11.1 Realized Risk vs Return
+
 # %%
-# 1) Realized risk-return scatter from the actual backtest.
-plot_methods = list(METHOD_ORDER) + [BENCHMARK_NAME]
 fig, ax = plt.subplots(figsize=(9, 6))
 points = ax.scatter(
     metrics.loc[plot_methods, "annualized_volatility"],
@@ -872,7 +974,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_risk_return_scatter.png", dpi=160)
 show_or_close(fig)
 
-# 2) Metric dashboard for quick comparison.
+# %% [markdown]
+# ### 11.2 Backtest Metric Dashboard
+
+# %%
 metric_specs = [
     ("final_value", "Final Value", False),
     ("cagr", "CAGR", False),
@@ -892,7 +997,12 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_metric_dashboard.png", dpi=160)
 show_or_close(fig)
 
-# 3) Relative wealth versus benchmark. Above 1.0 means outperforming S&P 500 since the start.
+# %% [markdown]
+# ### 11.3 Relative Wealth vs Benchmark
+#
+# Relative wealth above 1.0 means the portfolio is ahead of the S&P 500 benchmark since the test start.
+
+# %%
 relative_wealth = equity_curves[METHOD_ORDER].div(equity_curves[BENCHMARK_NAME], axis=0)
 relative_wealth.to_csv(OUTPUT_DIR / "backtest_relative_wealth_vs_benchmark.csv")
 
@@ -907,7 +1017,12 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_relative_wealth_vs_benchmark.png", dpi=160)
 show_or_close(fig)
 
-# 4) Calendar-year realized returns.
+# %% [markdown]
+# ### 11.4 Calendar-Year Returns
+#
+# Calendar-year returns make it easier to see whether performance comes from one period or persists across years.
+
+# %%
 annual_returns = daily_returns.groupby(daily_returns.index.year).apply(lambda frame: (1.0 + frame).prod() - 1.0)
 annual_returns.index.name = "year"
 annual_returns.to_csv(OUTPUT_DIR / "backtest_calendar_year_returns.csv")
@@ -930,7 +1045,12 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_calendar_year_returns.png", dpi=160)
 show_or_close(fig)
 
-# 5) Rolling one-year return, volatility, and Sharpe.
+# %% [markdown]
+# ### 11.5 Rolling 252-Day Metrics
+#
+# Rolling metrics show whether realized performance is stable or concentrated in short windows.
+
+# %%
 rolling_window = TRADING_DAYS
 rf_daily = risk_free["daily_rate_decimal"].reindex(daily_returns.index).ffill().bfill()
 
@@ -944,6 +1064,10 @@ rolling_return.to_csv(OUTPUT_DIR / "backtest_rolling_252d_return.csv")
 rolling_volatility.to_csv(OUTPUT_DIR / "backtest_rolling_252d_volatility.csv")
 rolling_sharpe.to_csv(OUTPUT_DIR / "backtest_rolling_252d_sharpe.csv")
 
+# %% [markdown]
+# ### 11.6 Rolling 252-Day Return
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 7))
 for method in plot_methods:
     ax.plot(rolling_return.index, rolling_return[method], label=short_method_name(method), linewidth=1.5)
@@ -955,6 +1079,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "backtest_rolling_252d_return.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 11.7 Rolling 252-Day Sharpe Ratio
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 7))
 for method in plot_methods:
     ax.plot(rolling_sharpe.index, rolling_sharpe[method], label=short_method_name(method), linewidth=1.5)
@@ -967,3 +1095,17 @@ fig.savefig(OUTPUT_DIR / "backtest_rolling_252d_sharpe.png", dpi=160)
 show_or_close(fig)
 
 print("Saved additional backtest diagnostic charts.")
+
+# %% [markdown]
+# ## 12. Output Manifest
+#
+# Review whether the main backtest output files exist after running the notebook.
+
+# %%
+display(backtest_output_manifest)
+
+missing_outputs = backtest_output_manifest.loc[~backtest_output_manifest["exists"], "file"].tolist()
+if missing_outputs:
+    print("Missing expected backtest outputs:", missing_outputs)
+else:
+    print(f"All {len(backtest_output_manifest)} core backtest outputs are present.")

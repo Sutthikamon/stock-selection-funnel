@@ -1,0 +1,12 @@
+file,exists,size_bytes
+docs/final_summary_report.md,True,19771
+outputs/final_data_summary.csv,True,440
+outputs/final_full_pipeline_metrics_table.csv,True,493
+outputs/final_allocation_only_metrics_table.csv,True,490
+outputs/final_04_vs_05_cagr_table.csv,True,342
+outputs/final_full_pipeline_scorecard.png,True,80353
+outputs/final_04_vs_05_comparison.csv,True,1107
+outputs/final_04_vs_05_cagr_comparison.png,True,67522
+outputs/final_top_selected_stocks.csv,True,3036
+outputs/final_top_selected_stocks.png,True,57067
+outputs/final_selection_stability_and_turnover.png,True,106442

@@ -12,7 +12,7 @@ This project uses the current S&P 500 constituent universe as the stock universe
 |---|---|---|
 | 01 | `notebooks/01_prepare_sp500_data.ipynb` | Prepare the current S&P 500 constituent universe, prices, returns, benchmark, and quality reports |
 | 02 | `notebooks/02_select_stocks_clustering_mst.ipynb` | Select one stock per correlation cluster using historical Sharpe ratio as a backward-looking ranking heuristic, and create MST diagnostics |
-| 03 | `notebooks/03_allocate_portfolios.ipynb` | Allocate the latest selected stocks using Equal Weight, Inverse Volatility, Markowitz-style Mean-Volatility Optimization, Risk Parity, CVaR Monte Carlo, and CVaR Bootstrap |
+| 03 | `notebooks/03_allocate_portfolios.ipynb` | Allocate the latest selected stocks using Equal Weight, Inverse Volatility, Markowitz-style Mean-Volatility Optimization, Risk Parity, CVaR Bootstrap, and CVaR Monte Carlo |
 | 04 | `notebooks/04_backtest_allocation_only.ipynb` | Run an allocation-only walk-forward test using the fixed Step 02 selected-stock list |
 | 05 | `notebooks/05_backtest_full_pipeline_walkforward.ipynb` | Run the main full-pipeline walk-forward simulation by re-running stock selection and allocation at each rebalance |
 | 06 | `notebooks/06_final_summary_report.ipynb` | Build the final summary report and comparison charts |

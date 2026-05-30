@@ -1,6 +1,6 @@
 # Final Project Summary
 
-Generated: 2026-05-02 23:46:50
+Generated: 2026-05-31 01:04:40
 
 ## Executive Summary
 
@@ -29,30 +29,30 @@ Important limitation: Step 05 fixes the major look-ahead issue from using one fi
 | Full-pipeline last holding date      | 2026-05-01               |
 | Full-pipeline unique selected stocks | 114                      |
 | Average monthly selection overlap    | 0.6075                   |
-| Missing holding-return audit rows     | 0                        |
+| Missing holding-return audit rows    | 0                        |
 
 ## Workflow Summary
 
-| Step | File                                                  | Purpose                                                                               |
-| ---- | ----------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| 01   | notebooks/01_prepare_sp500_data.ipynb                 | Prepare S&P 500 universe, prices, returns, benchmark, and quality reports             |
-| 02   | notebooks/02_select_stocks_clustering_mst.ipynb       | Cluster stocks and select one stock per cluster using historical Sharpe as a backward-looking ranking heuristic |
+| Step | File                                                  | Purpose                                                                                                                                                                      |
+| ---- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 01   | notebooks/01_prepare_sp500_data.ipynb                 | Prepare S&P 500 universe, prices, returns, benchmark, and quality reports                                                                                                    |
+| 02   | notebooks/02_select_stocks_clustering_mst.ipynb       | Cluster stocks and select one stock per cluster using historical Sharpe as a backward-looking ranking heuristic                                                              |
 | 03   | notebooks/03_allocate_portfolios.ipynb                | Create current portfolio allocations using Equal Weight, Inverse Volatility, Markowitz-style Mean-Volatility Optimization, Risk Parity, CVaR Bootstrap, and CVaR Monte Carlo |
-| 04   | notebooks/04_backtest_allocation_only.ipynb           | Allocation-only walk-forward test using the fixed Step 02 selected-stock list |
-| 05   | notebooks/05_backtest_full_pipeline_walkforward.ipynb | Main full-pipeline walk-forward simulation with stock selection and allocation rerun each rebalance |
-| 06   | notebooks/06_final_summary_report.ipynb               | Final project summary and comparison report                                           |
+| 04   | notebooks/04_backtest_allocation_only.ipynb           | Allocation-only walk-forward test using the fixed Step 02 selected-stock list                                                                                                |
+| 05   | notebooks/05_backtest_full_pipeline_walkforward.ipynb | Main full-pipeline walk-forward simulation with stock selection and allocation rerun each rebalance                                                                          |
+| 06   | notebooks/06_final_summary_report.ipynb               | Final project summary and comparison report                                                                                                                                  |
 
 ## Step 05 Full-Pipeline Results
 
-| Method             | Final Value | CAGR   | Sharpe | Max Drawdown | Volatility | Turnover |
-| ------------------ | ----------- | ------ | ------ | ------------ | ---------- | -------- |
-| Equal Weight       | 1.6381      | 12.09% | 0.5343 | -23.32%      | 16.34%     | 28.95    |
-| Inverse Volatility | 1.6769      | 12.70% | 0.6144 | -21.78%      | 14.68%     | 29.46    |
-| Risk Parity        | 1.6337      | 12.02% | 0.5772 | -21.68%      | 14.54%     | 27.34    |
+| Method                                       | Final Value | CAGR   | Sharpe | Max Drawdown | Volatility | Turnover |
+| -------------------------------------------- | ----------- | ------ | ------ | ------------ | ---------- | -------- |
+| Equal Weight                                 | 1.6381      | 12.09% | 0.5343 | -23.32%      | 16.34%     | 28.95    |
+| Inverse Volatility                           | 1.6769      | 12.70% | 0.6144 | -21.78%      | 14.68%     | 29.46    |
+| Risk Parity                                  | 1.6337      | 12.02% | 0.5772 | -21.68%      | 14.54%     | 27.34    |
 | Markowitz-style Mean-Volatility Optimization | 1.5341      | 10.41% | 0.4013 | -30.50%      | 19.25%     | 30.61    |
-| CVaR Bootstrap     | 1.6721      | 12.63% | 0.6357 | -20.64%      | 13.91%     | 34.89    |
-| CVaR Monte Carlo   | 1.5025      | 9.87%  | 0.4644 | -23.67%      | 13.60%     | 32.20    |
-| S&P 500            | 1.5231      | 10.22% | 0.4127 | -25.43%      | 17.55%     | 0.00     |
+| CVaR Bootstrap                               | 1.6721      | 12.63% | 0.6357 | -20.64%      | 13.91%     | 34.89    |
+| CVaR Monte Carlo                             | 1.5025      | 9.87%  | 0.4644 | -23.67%      | 13.60%     | 32.20    |
+| S&P 500                                      | 1.5231      | 10.22% | 0.4127 | -25.43%      | 17.55%     | 0.00     |
 
 ## Step 05 Audit Outputs
 
@@ -62,21 +62,21 @@ Step 05 exports `outputs/full_pipeline_selected_stocks_history.csv` with audit m
 - `train_end_date`: rebalance date used as the final training date
 - `selection_mode`: `walk_forward_past_data_only`
 
-This metadata makes the selected-stock history easier to audit because each record states the data window used for selection. Step 05 also exports `outputs/full_pipeline_missing_holding_returns.csv` to audit missing realized holding-period returns. The latest run has zero missing-return audit rows.
+This metadata makes the selected-stock history easier to audit because each record states the data window used for selection. Step 05 also exports `outputs/full_pipeline_missing_holding_returns.csv` to audit missing realized holding-period returns. The latest run has 0 missing-return audit rows.
 
 ## Step 04 vs Step 05: Leakage Impact
 
 Step 04 used the fixed 25 stocks selected with full-history information. Step 05 reselects stocks every rebalance using only past data. The gap shows how much the fixed selected-stock list inflated the allocation-only backtest.
 
-| Method             | 04 Allocation-only CAGR | 05 Full-pipeline CAGR | CAGR Gap |
-| ------------------ | ----------------------- | --------------------- | -------- |
-| Equal Weight       | 27.37%                  | 12.09%                | 15.28%   |
-| Inverse Volatility | 25.48%                  | 12.70%                | 12.78%   |
-| Risk Parity        | 23.43%                  | 12.02%                | 11.41%   |
+| Method                                       | 04 Allocation-only CAGR | 05 Full-pipeline CAGR | CAGR Gap |
+| -------------------------------------------- | ----------------------- | --------------------- | -------- |
+| Equal Weight                                 | 27.37%                  | 12.09%                | 15.28%   |
+| Inverse Volatility                           | 25.48%                  | 12.70%                | 12.78%   |
+| Risk Parity                                  | 23.43%                  | 12.02%                | 11.41%   |
 | Markowitz-style Mean-Volatility Optimization | 26.48%                  | 10.41%                | 16.08%   |
-| CVaR Bootstrap     | 17.97%                  | 12.63%                | 5.34%    |
-| CVaR Monte Carlo   | 14.47%                  | 9.87%                 | 4.59%    |
-| S&P 500            | 10.22%                  | 10.22%                | 0.00%    |
+| CVaR Bootstrap                               | 17.97%                  | 12.63%                | 5.34%    |
+| CVaR Monte Carlo                             | 14.47%                  | 9.87%                 | 4.59%    |
+| S&P 500                                      | 10.22%                  | 10.22%                | 0.00%    |
 
 ## Most Frequently Selected Stocks in Step 05
 
@@ -155,7 +155,7 @@ These are useful for the current allocation view, but should not be treated as a
 ### Methodology Limitations
 
 - Step 04 is intentionally allocation-only and uses the fixed 25 stocks from Step 02; it should not be used as the main historical strategy result.
-- Step 05 fixes the fixed-stock look-ahead issue by reselecting each rebalance and now records `train_start_date`, `train_end_date`, and `selection_mode` in the selected-stock history, but it still does not fix point-in-time S&P 500 membership bias.
+- Step 05 fixes the fixed-stock look-ahead issue by reselecting each rebalance and records `train_start_date`, `train_end_date`, and `selection_mode` in the selected-stock history, but it still does not fix point-in-time S&P 500 membership bias.
 - The within-cluster stock selection uses historical Sharpe ratio as a backward-looking ranking heuristic, not as a predictive model of future returns. High past Sharpe may not persist out of sample.
 - The clustering distance uses 1 minus Spearman correlation as a practical similarity-to-distance transformation. Alternative correlation-distance definitions such as `sqrt(2*(1-rho))` could be tested in future robustness checks.
 - The number of clusters is fixed at 25 as a design choice. Different cluster counts may lead to different diversification and performance results. Future work should test sensitivity across multiple cluster counts such as 15, 20, 25, and 30.

@@ -1,5 +1,5 @@
 # %% [markdown]
-# # 05 Full-Pipeline Walk-Forward Backtest
+# # 5. Full-Pipeline Walk-Forward Backtest
 #
 # This notebook-style script backtests the full workflow:
 #
@@ -13,6 +13,24 @@
 # - It still uses the current S&P 500 constituent universe from the project data, so it is not a true
 #   point-in-time S&P 500 constituent backtest.
 # - Historical Sharpe is used as a backward-looking ranking heuristic, not as a predictive model.
+
+# %% [markdown]
+# ## Workflow
+#
+# 1. Configure paths, universe rules, selection thresholds, allocation constraints, and model settings.
+# 2. Load Step 01 returns, benchmark returns, and current S&P 500 metadata.
+# 3. Build the historical risk-free rate series used for Sharpe and Sortino metrics.
+# 4. Define stock-selection helpers for each rebalance date.
+# 5. Define allocation helpers and model functions.
+# 6. Run the full-pipeline walk-forward loop: select stocks, allocate weights, hold the next month, and audit changes.
+# 7. Evaluate realized performance and save output tables.
+# 8. Build performance, selection, stability, and turnover charts.
+# 9. Review the output manifest and interpretation note.
+
+# %% [markdown]
+# ## 1. Setup and Configuration
+#
+# Set project paths, universe-selection assumptions, stock-selection thresholds, allocation constraints, optimizer grids, scenario settings, method order, and benchmark naming.
 
 # %%
 from pathlib import Path
@@ -98,13 +116,15 @@ print(f"Project root: {PROJECT_ROOT}")
 print(f"Outputs will be written to: {OUTPUT_DIR}")
 
 # %% [markdown]
-# ## Load Real Project Data
+# ## 2. Load Step 01 Data and Current Universe
 #
-# This file uses the actual data prepared by step 01:
+# This file uses the data prepared by Step 01:
 #
 # - `data/returns_matrix.parquet`
 # - `data/benchmark_returns.parquet`
 # - `data/sp500_universe.csv`
+#
+# Important limitation: the investable universe is still the current S&P 500 constituent set from Step 01, not point-in-time historical membership.
 
 # %%
 def estimate_trading_days_per_year(index: pd.Index) -> int:
@@ -146,11 +166,9 @@ if len(returns_all) <= MIN_TRAINING_DAYS:
     raise ValueError("Not enough data to create a full-pipeline walk-forward backtest.")
 
 # %% [markdown]
-# ## Historical Risk-Free Rate
+# ## 3. Historical Risk-Free Rate
 #
-# The backtest uses historical FRED `DGS3MO` when available. If online access fails, it falls back to the
-# saved step-03 risk-free rate. For strict production trading, these observations should be lagged by one
-# business day to account for publication timing.
+# The backtest uses historical FRED `DGS3MO` when available. If online access fails, it falls back to the saved Step 03 risk-free rate. For strict production trading, these observations should be lagged by one business day to account for publication timing.
 
 # %%
 def fetch_fred_dgs3mo_history(start_date, end_date):
@@ -206,7 +224,7 @@ def build_risk_free_series(index: pd.Index):
     except Exception as error:
         warnings.warn(
             "Could not fetch historical FRED DGS3MO rates. "
-            f"Falling back to saved step-03 risk-free rate. Error: {error}"
+            f"Falling back to saved Step 03 risk-free rate. Error: {error}"
         )
         saved = load_saved_risk_free_rate()
         out = pd.DataFrame(
@@ -230,7 +248,12 @@ print("Risk-free source used:", risk_free["source"].iloc[0], risk_free["series_i
 print("Risk-free annual range:", risk_free["annual_rate_decimal"].min(), "to", risk_free["annual_rate_decimal"].max())
 
 # %% [markdown]
-# ## Stock Selection Helpers
+# ## 4. Stock Selection Helpers
+#
+# These functions re-create the Step 02 selection process inside each rebalance using only returns available through that rebalance date.
+
+# %% [markdown]
+# ### 4.1 Return and Sharpe Helpers
 
 # %%
 def annualized_geometric_return(return_series: pd.Series, periods_per_year: int = 252) -> float:
@@ -241,18 +264,6 @@ def annualized_geometric_return(return_series: pd.Series, periods_per_year: int 
     if compounded <= 0:
         return np.nan
     return compounded ** (periods_per_year / len(s)) - 1.0
-
-
-def compute_spearman_correlation(returns: pd.DataFrame, min_overlap_days: int) -> pd.DataFrame:
-    corr = returns.corr(method="spearman", min_periods=min_overlap_days).copy()
-    corr = corr.reindex(index=returns.columns, columns=returns.columns)
-    for ticker in corr.index:
-        corr.loc[ticker, ticker] = 1.0
-    corr = corr.fillna(0.0).clip(-1.0, 1.0)
-    for ticker in corr.index:
-        corr.loc[ticker, ticker] = 1.0
-    return corr
-
 
 def compute_sharpe_table(returns: pd.DataFrame, annual_risk_free: float) -> pd.DataFrame:
     annual_return = returns.apply(annualized_geometric_return, periods_per_year=TRADING_DAYS)
@@ -274,7 +285,24 @@ def compute_sharpe_table(returns: pd.DataFrame, annual_risk_free: float) -> pd.D
     table.loc[table["observations"] < MIN_SHARPE_OBSERVATIONS, "sharpe_ratio"] = np.nan
     return table
 
+# %% [markdown]
+# ### 4.2 Spearman Correlation Helper
 
+# %%
+def compute_spearman_correlation(returns: pd.DataFrame, min_overlap_days: int) -> pd.DataFrame:
+    corr = returns.corr(method="spearman", min_periods=min_overlap_days).copy()
+    corr = corr.reindex(index=returns.columns, columns=returns.columns)
+    for ticker in corr.index:
+        corr.loc[ticker, ticker] = 1.0
+    corr = corr.fillna(0.0).clip(-1.0, 1.0)
+    for ticker in corr.index:
+        corr.loc[ticker, ticker] = 1.0
+    return corr
+
+# %% [markdown]
+# ### 4.3 Walk-Forward Stock Selector
+
+# %%
 def select_stocks_for_rebalance(train_returns_all: pd.DataFrame, rebalance_date: pd.Timestamp):
     obs = train_returns_all.notna().sum()
     recent_obs = train_returns_all.tail(RECENT_WINDOW_DAYS).notna().sum()
@@ -337,7 +365,12 @@ def select_stocks_for_rebalance(train_returns_all: pd.DataFrame, rebalance_date:
     return selected, selection_table
 
 # %% [markdown]
-# ## Allocation Helpers and Models
+# ## 5. Allocation Helpers and Model Functions
+#
+# These functions allocate weights for the dynamically selected stocks at each rebalance.
+
+# %% [markdown]
+# ### 5.1 Shared Allocation Helpers
 
 # %%
 def annualized_mean(returns: pd.DataFrame) -> pd.Series:
@@ -407,7 +440,10 @@ def portfolio_training_metrics(weights, returns: pd.DataFrame, annual_risk_free:
 def delta_label(value):
     return f"d{value:.4g}".replace(".", "_")
 
+# %% [markdown]
+# ### 5.2 Baseline Allocation Functions
 
+# %%
 def allocate_equal_weight(returns: pd.DataFrame):
     n = returns.shape[1]
     return np.ones(n) / n
@@ -419,7 +455,10 @@ def allocate_inverse_volatility(returns: pd.DataFrame):
     inv_vol = inv_vol.replace([np.inf, -np.inf], np.nan).fillna(0.0)
     return cap_and_redistribute(inv_vol.to_numpy())
 
+# %% [markdown]
+# ### 5.3 Markowitz-Style Mean-Volatility Allocation
 
+# %%
 def allocate_markowitz(returns: pd.DataFrame, delta: float):
     mu = annualized_mean(returns).to_numpy()
     cov = annualized_cov(returns).to_numpy()
@@ -446,7 +485,10 @@ def allocate_markowitz(returns: pd.DataFrame, delta: float):
         return allocate_equal_weight(returns)
     return cap_and_redistribute(result.x)
 
+# %% [markdown]
+# ### 5.4 Risk Parity Allocation
 
+# %%
 def allocate_risk_parity(returns: pd.DataFrame):
     cov = annualized_cov(returns).to_numpy()
     n = cov.shape[0]
@@ -480,7 +522,10 @@ def allocate_risk_parity(returns: pd.DataFrame):
         return allocate_inverse_volatility(returns)
     return cap_and_redistribute(result.x)
 
+# %% [markdown]
+# ### 5.5 CVaR Scenario Generators
 
+# %%
 def generate_bootstrap_scenarios(returns: pd.DataFrame, n_scenarios=N_SCENARIOS, seed=RANDOM_SEED):
     rng = np.random.default_rng(seed)
     values = returns.to_numpy()
@@ -494,7 +539,10 @@ def generate_monte_carlo_scenarios(returns: pd.DataFrame, n_scenarios=N_SCENARIO
     cov = returns.cov().to_numpy() + np.eye(returns.shape[1]) * 1e-10
     return rng.multivariate_normal(mean=mu, cov=cov, size=n_scenarios)
 
+# %% [markdown]
+# ### 5.6 CVaR Allocation
 
+# %%
 def allocate_cvar(scenarios: np.ndarray, fallback_returns: pd.DataFrame, alpha=CVAR_ALPHA, return_tradeoff=CVAR_RETURN_TRADEOFF):
     scenarios = np.asarray(scenarios, dtype=float)
     n_scenarios, n_assets = scenarios.shape
@@ -532,7 +580,10 @@ def allocate_cvar(scenarios: np.ndarray, fallback_returns: pd.DataFrame, alpha=C
 
     return cap_and_redistribute(result.x[:n_assets])
 
+# %% [markdown]
+# ### 5.7 Rebalance Weight Computation
 
+# %%
 def compute_rebalance_weights(allocation_returns: pd.DataFrame, rebalance_date: pd.Timestamp, period_number: int):
     annual_rf = float(risk_free.loc[rebalance_date, "annual_rate_decimal"])
 
@@ -592,7 +643,12 @@ def compute_rebalance_weights(allocation_returns: pd.DataFrame, rebalance_date: 
     return out, frontier
 
 # %% [markdown]
-# ## Full-Pipeline Walk-Forward Engine
+# ## 6. Full-Pipeline Walk-Forward Engine
+#
+# The engine re-selects stocks, re-allocates weights, applies transaction costs, records realized holding-period returns, and saves selection-audit metadata at each rebalance.
+
+# %% [markdown]
+# ### 6.1 Month-End Rebalance Calendar
 
 # %%
 def make_month_end_rebalance_dates(index: pd.Index, min_training_days: int):
@@ -605,7 +661,10 @@ def make_month_end_rebalance_dates(index: pd.Index, min_training_days: int):
         raise ValueError("Not enough rebalance dates after applying the minimum training window.")
     return rebalance_dates
 
+# %% [markdown]
+# ### 6.2 Turnover and Weight Drift Helpers
 
+# %%
 def align_turnover(previous: pd.Series, target: pd.Series):
     union = previous.index.union(target.index)
     prev = previous.reindex(union).fillna(0.0)
@@ -628,7 +687,54 @@ def update_drifted_weights(weights: pd.Series, asset_returns: pd.Series):
         new_weights = new_weights / new_weights.sum()
     return new_weights, gross_return
 
+# %% [markdown]
+# ### 6.3 Selection and Missing-Return Audit Helpers
 
+# %%
+def build_selection_overlap_record(rebalance_date: pd.Timestamp, current_selected: set[str], previous_selected: set[str]):
+    if previous_selected:
+        entered = sorted(current_selected - previous_selected)
+        exited = sorted(previous_selected - current_selected)
+        intersection = len(current_selected & previous_selected)
+        union = len(current_selected | previous_selected)
+        jaccard = intersection / union if union else np.nan
+    else:
+        entered = sorted(current_selected)
+        exited = []
+        intersection = 0
+        union = len(current_selected)
+        jaccard = np.nan
+
+    return {
+        "rebalance_date": rebalance_date,
+        "selected_count": len(current_selected),
+        "entered_count": len(entered),
+        "exited_count": len(exited),
+        "overlap_count": intersection,
+        "union_count": union,
+        "jaccard_vs_previous": jaccard,
+        "entered_tickers": ",".join(entered),
+        "exited_tickers": ",".join(exited),
+    }
+
+
+def build_missing_holding_return_record(rebalance_date: pd.Timestamp, holding_returns: pd.DataFrame):
+    missing_count = int(holding_returns.isna().sum().sum())
+    if not missing_count:
+        return None
+
+    return {
+        "rebalance_date": rebalance_date,
+        "holding_start_date": holding_returns.index.min(),
+        "holding_end_date": holding_returns.index.max(),
+        "missing_return_count": missing_count,
+        "tickers_with_missing": ",".join(holding_returns.columns[holding_returns.isna().any()].tolist()),
+    }
+
+# %% [markdown]
+# ### 6.4 Main Full-Pipeline Backtest Loop
+
+# %%
 def run_full_pipeline_backtest():
     rebalance_dates = make_month_end_rebalance_dates(returns_all.index, MIN_TRAINING_DAYS)
     first_rebalance_date = rebalance_dates[0]
@@ -658,31 +764,8 @@ def run_full_pipeline_backtest():
         selected_records.append(selected)
 
         current_selected = set(selected_tickers)
-        if previous_selected:
-            entered = sorted(current_selected - previous_selected)
-            exited = sorted(previous_selected - current_selected)
-            intersection = len(current_selected & previous_selected)
-            union = len(current_selected | previous_selected)
-            jaccard = intersection / union if union else np.nan
-        else:
-            entered = sorted(current_selected)
-            exited = []
-            intersection = 0
-            union = len(current_selected)
-            jaccard = np.nan
-
         selected_overlap_records.append(
-            {
-                "rebalance_date": rebalance_date,
-                "selected_count": len(selected_tickers),
-                "entered_count": len(entered),
-                "exited_count": len(exited),
-                "overlap_count": intersection,
-                "union_count": union,
-                "jaccard_vs_previous": jaccard,
-                "entered_tickers": ",".join(entered),
-                "exited_tickers": ",".join(exited),
-            }
+            build_selection_overlap_record(rebalance_date, current_selected, previous_selected)
         )
         previous_selected = current_selected
 
@@ -703,17 +786,9 @@ def run_full_pipeline_backtest():
         if holding_returns.empty:
             continue
 
-        missing_count = int(holding_returns.isna().sum().sum())
-        if missing_count:
-            missing_holding_records.append(
-                {
-                    "rebalance_date": rebalance_date,
-                    "holding_start_date": holding_returns.index.min(),
-                    "holding_end_date": holding_returns.index.max(),
-                    "missing_return_count": missing_count,
-                    "tickers_with_missing": ",".join(holding_returns.columns[holding_returns.isna().any()].tolist()),
-                }
-            )
+        missing_record = build_missing_holding_return_record(rebalance_date, holding_returns)
+        if missing_record is not None:
+            missing_holding_records.append(missing_record)
 
         pending_cost = {}
         for method in METHOD_ORDER:
@@ -826,7 +901,10 @@ def run_full_pipeline_backtest():
         metadata_out,
     )
 
+# %% [markdown]
+# ### 6.5 Execute Full-Pipeline Backtest
 
+# %%
 (
     daily_returns,
     equity_curves,
@@ -845,7 +923,10 @@ print("Last holding date:", backtest_meta["last_holding_date"].date())
 print("Rebalance count:", backtest_meta["rebalance_count"])
 
 # %% [markdown]
-# ## Evaluate Full-Pipeline Performance
+# ## 7. Evaluate Full-Pipeline Performance
+
+# %% [markdown]
+# ### 7.1 Performance Metric Helpers
 
 # %%
 def max_drawdown(equity_curve: pd.Series):
@@ -923,7 +1004,10 @@ def summarize_performance(daily_returns: pd.DataFrame, equity_curves: pd.DataFra
 
     return pd.DataFrame(rows).set_index("method")
 
+# %% [markdown]
+# ### 7.2 Compute Metrics and Drawdowns
 
+# %%
 drawdowns = equity_curves.apply(lambda col: col / col.cummax() - 1.0)
 metrics = summarize_performance(daily_returns, equity_curves, turnover)
 
@@ -936,7 +1020,10 @@ except NameError:
     print(metrics_display)
 
 # %% [markdown]
-# ## Save Outputs
+# ## 8. Save Outputs and Audit Tables
+
+# %% [markdown]
+# ### 8.1 Save Core Performance and Audit Outputs
 
 # %%
 daily_returns.to_csv(OUTPUT_DIR / "full_pipeline_daily_returns.csv")
@@ -950,6 +1037,25 @@ selected_overlap.to_csv(OUTPUT_DIR / "full_pipeline_selected_overlap.csv", index
 markowitz_frontier_history.to_csv(OUTPUT_DIR / "full_pipeline_markowitz_frontier_history.csv", index=False)
 missing_holding_returns.to_csv(OUTPUT_DIR / "full_pipeline_missing_holding_returns.csv", index=False)
 
+
+full_pipeline_core_output_files = [
+    "full_pipeline_daily_returns.csv",
+    "full_pipeline_equity_curves.csv",
+    "full_pipeline_drawdowns.csv",
+    "full_pipeline_metrics.csv",
+    "full_pipeline_turnover.csv",
+    "full_pipeline_weights_history.csv",
+    "full_pipeline_selected_stocks_history.csv",
+    "full_pipeline_selected_overlap.csv",
+    "full_pipeline_markowitz_frontier_history.csv",
+    "full_pipeline_missing_holding_returns.csv",
+    "full_pipeline_risk_free_rates.csv",
+]
+
+# %% [markdown]
+# ### 8.2 Build Selection Frequency Table
+
+# %%
 selection_frequency = (
     selected_history.groupby("ticker")
     .agg(
@@ -967,6 +1073,10 @@ if meta_cols:
     selection_frequency = selection_frequency.join(metadata[meta_cols], how="left")
 selection_frequency.to_csv(OUTPUT_DIR / "full_pipeline_selection_frequency.csv")
 
+# %% [markdown]
+# ### 8.3 Save Configuration
+
+# %%
 config_rows = [
     ("project_root", "."),
     ("universe_mode", "current_sp500_constituents_from_step_01_not_point_in_time"),
@@ -1002,11 +1112,28 @@ pd.DataFrame(config_rows, columns=["setting", "value"]).to_csv(OUTPUT_DIR / "ful
 
 print("Saved full-pipeline outputs to:", OUTPUT_DIR)
 print(metrics[["final_value", "cagr", "annualized_volatility", "sharpe_ratio", "max_drawdown"]].round(4))
-print("Unique selected stocks:", selection_frequency.shape[0])
-print("Average monthly selection overlap:", selected_overlap["jaccard_vs_previous"].dropna().mean())
 
 # %% [markdown]
-# ## Charts
+# ### 8.4 Audit Summary
+
+# %%
+full_pipeline_audit_summary = pd.DataFrame([
+    {"item": "rebalance_count", "value": backtest_meta["rebalance_count"]},
+    {"item": "selected_history_rows", "value": len(selected_history)},
+    {"item": "unique_selected_stocks", "value": selection_frequency.shape[0]},
+    {"item": "missing_holding_return_rows", "value": len(missing_holding_returns)},
+    {"item": "average_monthly_selection_overlap", "value": selected_overlap["jaccard_vs_previous"].dropna().mean()},
+])
+
+display(full_pipeline_audit_summary)
+
+# %% [markdown]
+# ## 9. Core Full-Pipeline Charts
+
+# %% [markdown]
+# ### 9.1 Chart Setup
+#
+# These charts are interpretation checks after the full-pipeline walk-forward selection and allocation have run.
 
 # %%
 plt.style.use("seaborn-v0_8-whitegrid")
@@ -1024,7 +1151,7 @@ def short_method_name(method):
         "equal": "Equal",
         "inverse_volatility": "Inv Vol",
         "risk_parity": "Risk Parity",
-        "markowitz_best_sharpe_default": "Markowitz-style Mean-Volatility",
+        "markowitz_best_sharpe_default": "Mean-Vol",
         "cvar_bootstrap": "CVaR Boot",
         "cvar_montecarlo": "CVaR MC",
         BENCHMARK_NAME: "S&P 500",
@@ -1033,6 +1160,10 @@ def short_method_name(method):
 
 plot_methods = list(METHOD_ORDER) + [BENCHMARK_NAME]
 
+# %% [markdown]
+# ### 9.2 Full-Pipeline Equity Curves
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 7))
 for col in plot_methods:
     ax.plot(equity_curves.index, equity_curves[col], label=short_method_name(col), linewidth=1.7)
@@ -1043,6 +1174,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_equity_curves.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 9.3 Full-Pipeline Drawdowns
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 7))
 for col in plot_methods:
     ax.plot(drawdowns.index, drawdowns[col], label=short_method_name(col), linewidth=1.4)
@@ -1053,6 +1188,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_drawdowns.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 9.4 Full-Pipeline Realized Risk vs Return
+
+# %%
 fig, ax = plt.subplots(figsize=(9, 6))
 points = ax.scatter(
     metrics.loc[plot_methods, "annualized_volatility"],
@@ -1080,6 +1219,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_risk_return_scatter.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 9.5 Full-Pipeline Metric Dashboard
+
+# %%
 metric_specs = [
     ("final_value", "Final Value", False),
     ("cagr", "CAGR", False),
@@ -1099,6 +1242,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_metric_dashboard.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 9.6 Full-Pipeline Relative Wealth vs Benchmark
+
+# %%
 relative_wealth = equity_curves[METHOD_ORDER].div(equity_curves[BENCHMARK_NAME], axis=0)
 relative_wealth.to_csv(OUTPUT_DIR / "full_pipeline_relative_wealth_vs_benchmark.csv")
 
@@ -1113,6 +1260,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_relative_wealth_vs_benchmark.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 9.7 Full-Pipeline Calendar-Year/YTD Returns
+
+# %%
 annual_groups = daily_returns.groupby(daily_returns.index.year)
 annual_returns = annual_groups.apply(lambda frame: (1.0 + frame).prod() - 1.0)
 annual_returns.index.name = "year"
@@ -1153,6 +1304,15 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_calendar_year_returns.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ## 10. Selection and Turnover Diagnostics
+#
+# These charts explain how stable the selected stock set is and how much trading the dynamic workflow creates.
+
+# %% [markdown]
+# ### 10.1 Selected Stock Frequency
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 6))
 selection_frequency["selected_count"].head(30).sort_values().plot(kind="barh", ax=ax, color="#59A14F")
 ax.set_title("Most Frequently Selected Stocks in Full-Pipeline Backtest")
@@ -1161,6 +1321,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_selected_stock_frequency.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 10.2 Selected Stock Set Stability
+
+# %%
 fig, ax = plt.subplots(figsize=(12, 5))
 selected_overlap_plot = selected_overlap.set_index("rebalance_date")
 ax.plot(
@@ -1176,6 +1340,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "full_pipeline_selection_stability.png", dpi=160)
 show_or_close(fig)
 
+# %% [markdown]
+# ### 10.3 Full-Pipeline Turnover
+
+# %%
 fig, ax = plt.subplots(figsize=(10, 5))
 metrics.loc[METHOD_ORDER, "average_turnover_per_rebalance"].plot(kind="bar", ax=ax, color="#4C78A8")
 ax.set_title("Full-Pipeline Average Turnover per Rebalance")
@@ -1186,3 +1354,50 @@ fig.savefig(OUTPUT_DIR / "full_pipeline_turnover.png", dpi=160)
 show_or_close(fig)
 
 print("Saved full-pipeline charts.")
+
+# %% [markdown]
+# ## 11. Output Manifest
+#
+# Review whether the main full-pipeline output files exist after running the notebook.
+
+# %%
+full_pipeline_chart_output_files = [
+    "full_pipeline_equity_curves.png",
+    "full_pipeline_drawdowns.png",
+    "full_pipeline_risk_return_scatter.png",
+    "full_pipeline_metric_dashboard.png",
+    "full_pipeline_relative_wealth_vs_benchmark.csv",
+    "full_pipeline_relative_wealth_vs_benchmark.png",
+    "full_pipeline_calendar_year_returns.csv",
+    "full_pipeline_calendar_year_return_details.csv",
+    "full_pipeline_calendar_year_returns.png",
+    "full_pipeline_selected_stock_frequency.png",
+    "full_pipeline_selection_stability.png",
+    "full_pipeline_turnover.png",
+    "full_pipeline_config.csv",
+    "full_pipeline_selection_frequency.csv",
+]
+
+full_pipeline_output_files = full_pipeline_core_output_files + full_pipeline_chart_output_files
+full_pipeline_output_manifest = pd.DataFrame({
+    "file": full_pipeline_output_files,
+    "exists": [(OUTPUT_DIR / file).exists() for file in full_pipeline_output_files],
+    "size_bytes": [
+        (OUTPUT_DIR / file).stat().st_size if (OUTPUT_DIR / file).exists() else np.nan
+        for file in full_pipeline_output_files
+    ],
+})
+
+display(full_pipeline_output_manifest)
+
+missing_outputs = full_pipeline_output_manifest.loc[~full_pipeline_output_manifest["exists"], "file"].tolist()
+if missing_outputs:
+    print("Missing expected full-pipeline outputs:", missing_outputs)
+else:
+    print(f"All {len(full_pipeline_output_manifest)} expected full-pipeline outputs are present.")
+
+# %% [markdown]
+# ## 12. Interpretation Note
+#
+# Use Step 05 as the main evidence for the project. Treat Step 04 as a diagnostic that explains how allocation
+# methods behave after the stock list is already known, not as a leakage-free historical strategy result.

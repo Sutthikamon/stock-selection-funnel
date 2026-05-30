@@ -1,9 +1,22 @@
 # %% [markdown]
-# # 06 Final Summary Report
+# # 6. Final Summary Report
 #
 # This final notebook summarizes the whole project from data preparation through full-pipeline
 # walk-forward backtesting. It reads the real outputs from steps 01-05 and writes a compact
 # final report plus summary charts.
+
+# %% [markdown]
+# ## Workflow
+#
+# 1. Set project paths and expected output files.
+# 2. Load the Step 01-05 outputs needed for the final report.
+# 3. Define method labels, formatting helpers, and report tables.
+# 4. Create final comparison charts.
+# 5. Build and write the final Markdown report.
+# 6. Save final summary tables and verify the final report output manifest.
+
+# %% [markdown]
+# ## 1. Setup and Paths
 
 # %%
 from pathlib import Path
@@ -46,30 +59,57 @@ print(f"Project root: {PROJECT_ROOT}")
 print(f"Outputs will be written to: {OUTPUT_DIR}")
 
 # %% [markdown]
-# ## Load Final Outputs
+# ## 2. Load Final Inputs
+
+# %% [markdown]
+# ### 2.1 Required File Check
+
+# %%
+required_input_files = [
+    DATA_DIR / "returns_matrix.parquet",
+    DATA_DIR / "sp500_universe.csv",
+    OUTPUT_DIR / "selected_stocks.csv",
+    OUTPUT_DIR / "backtest_metrics.csv",
+    OUTPUT_DIR / "full_pipeline_metrics.csv",
+    OUTPUT_DIR / "full_pipeline_config.csv",
+    OUTPUT_DIR / "full_pipeline_selection_frequency.csv",
+    OUTPUT_DIR / "full_pipeline_selected_overlap.csv",
+    OUTPUT_DIR / "full_pipeline_missing_holding_returns.csv",
+]
+
+missing_inputs = [path for path in required_input_files if not path.exists()]
+if missing_inputs:
+    raise FileNotFoundError("Missing required final-report inputs: " + ", ".join(str(path) for path in missing_inputs))
+
+print(f"All {len(required_input_files)} required final-report inputs are available.")
+
+# %% [markdown]
+# ### 2.2 Load Data and Result Tables
 
 # %%
 returns_matrix = pd.read_parquet(DATA_DIR / "returns_matrix.parquet").sort_index()
-benchmark_returns = pd.read_parquet(DATA_DIR / "benchmark_returns.parquet").sort_index()
 sp500_universe = pd.read_csv(DATA_DIR / "sp500_universe.csv")
 
 selected_latest = pd.read_csv(OUTPUT_DIR / "selected_stocks.csv")
-portfolio_summary = pd.read_csv(OUTPUT_DIR / "portfolio_allocation_summary.csv").set_index("method")
 allocation_backtest = pd.read_csv(OUTPUT_DIR / "backtest_metrics.csv").set_index("method")
 full_pipeline = pd.read_csv(OUTPUT_DIR / "full_pipeline_metrics.csv").set_index("method")
 full_pipeline_config = pd.read_csv(OUTPUT_DIR / "full_pipeline_config.csv")
 selection_frequency = pd.read_csv(OUTPUT_DIR / "full_pipeline_selection_frequency.csv")
 selection_overlap = pd.read_csv(OUTPUT_DIR / "full_pipeline_selected_overlap.csv")
-selection_history = pd.read_csv(OUTPUT_DIR / "full_pipeline_selected_stocks_history.csv")
 missing_holding_returns = pd.read_csv(OUTPUT_DIR / "full_pipeline_missing_holding_returns.csv")
-annual_returns = pd.read_csv(OUTPUT_DIR / "full_pipeline_calendar_year_returns.csv")
-annual_return_details = pd.read_csv(OUTPUT_DIR / "full_pipeline_calendar_year_return_details.csv")
 
 returns_matrix.index = pd.to_datetime(returns_matrix.index)
-benchmark_returns.index = pd.to_datetime(benchmark_returns.index)
-
 config = dict(zip(full_pipeline_config["setting"], full_pipeline_config["value"]))
 
+print("Data window:", returns_matrix.index.min().date(), "to", returns_matrix.index.max().date())
+print("Returns matrix:", returns_matrix.shape)
+print("Latest selected stocks:", len(selected_latest))
+print("Full-pipeline methods:", full_pipeline.shape[0])
+
+# %% [markdown]
+# ### 2.3 Method Labels and Ordering
+
+# %%
 METHOD_LABELS = {
     "equal": "Equal Weight",
     "inverse_volatility": "Inverse Volatility",
@@ -90,13 +130,13 @@ METHOD_ORDER = [
     "benchmark_sp500",
 ]
 
-print("Data window:", returns_matrix.index.min().date(), "to", returns_matrix.index.max().date())
-print("Returns matrix:", returns_matrix.shape)
-print("Latest selected stocks:", len(selected_latest))
-print("Full-pipeline methods:", full_pipeline.shape[0])
+REPORT_GENERATED_AT = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 # %% [markdown]
-# ## Helper Functions
+# ## 3. Helper Functions
+
+# %% [markdown]
+# ### 3.1 Formatting Helpers
 
 # %%
 def pct(x, digits=2):
@@ -125,7 +165,10 @@ def markdown_table(df: pd.DataFrame) -> str:
     body = ["| " + " | ".join(str(row[i]).ljust(widths[i]) for i in range(len(headers))) + " |" for row in rows]
     return "\n".join([header, sep] + body)
 
+# %% [markdown]
+# ### 3.2 Metric Table Helper
 
+# %%
 def make_metric_table(metrics: pd.DataFrame) -> pd.DataFrame:
     rows = []
     for method in METHOD_ORDER:
@@ -160,6 +203,10 @@ def label_method(method):
 full_pipeline_table = make_metric_table(full_pipeline)
 allocation_backtest_table = make_metric_table(allocation_backtest)
 
+# %% [markdown]
+# ### 3.3 Preview Key Metrics
+
+# %%
 display_cols = ["final_value", "cagr", "sharpe_ratio", "max_drawdown", "annualized_volatility"]
 try:
     display(full_pipeline[display_cols].round(4))
@@ -167,15 +214,25 @@ except NameError:
     print(full_pipeline[display_cols].round(4))
 
 # %% [markdown]
-# ## Final Summary Charts
+# ## 4. Final Summary Charts
+
+# %% [markdown]
+# ### 4.1 Final Chart Setup
 
 # %%
 plt.style.use("seaborn-v0_8-whitegrid")
 
 plot_methods = [m for m in METHOD_ORDER if m in full_pipeline.index]
-method_names = [label_method(m) for m in plot_methods]
+def chart_label_method(method):
+    return {"markowitz_best_sharpe_default": "Mean-Vol"}.get(method, label_method(method))
 
-# 1) Main full-pipeline scorecard.
+
+method_names = [chart_label_method(m) for m in plot_methods]
+
+# %% [markdown]
+# ### 4.2 Final Full-Pipeline Scorecard
+
+# %%
 score_cols = ["cagr", "sharpe_ratio", "max_drawdown"]
 fig, axes = plt.subplots(1, 3, figsize=(15, 5))
 for ax, col, title in zip(axes, score_cols, ["CAGR", "Sharpe Ratio", "Max Drawdown"]):
@@ -191,7 +248,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "final_full_pipeline_scorecard.png", dpi=160)
 show_or_close(fig)
 
-# 2) Allocation-only vs full-pipeline leakage impact.
+# %% [markdown]
+# ### 4.3 Allocation-Only vs Full-Pipeline Comparison
+
+# %%
 comparison_rows = []
 for method in METHOD_ORDER:
     if method in allocation_backtest.index and method in full_pipeline.index:
@@ -199,6 +259,7 @@ for method in METHOD_ORDER:
             {
                 "method": method,
                 "Method": label_method(method),
+                "Chart Label": chart_label_method(method),
                 "allocation_only_cagr": allocation_backtest.loc[method, "cagr"],
                 "full_pipeline_cagr": full_pipeline.loc[method, "cagr"],
                 "cagr_gap": allocation_backtest.loc[method, "cagr"] - full_pipeline.loc[method, "cagr"],
@@ -215,7 +276,7 @@ fig, ax = plt.subplots(figsize=(12, 6))
 ax.bar(x - width / 2, leakage_comparison["allocation_only_cagr"], width, label="04 Allocation-only", color="#59A14F")
 ax.bar(x + width / 2, leakage_comparison["full_pipeline_cagr"], width, label="05 Full-pipeline", color="#4C78A8")
 ax.set_xticks(x)
-ax.set_xticklabels(leakage_comparison["Method"], rotation=35, ha="right")
+ax.set_xticklabels(leakage_comparison["Chart Label"], rotation=35, ha="right")
 ax.set_ylabel("CAGR")
 ax.set_title("Leakage Impact: Allocation-only vs Full-pipeline CAGR")
 ax.legend()
@@ -223,7 +284,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "final_04_vs_05_cagr_comparison.png", dpi=160)
 show_or_close(fig)
 
-# 3) Selection frequency top names.
+# %% [markdown]
+# ### 4.4 Top Selected Stocks
+
+# %%
 top_selection = selection_frequency.head(20).copy()
 top_selection.to_csv(OUTPUT_DIR / "final_top_selected_stocks.csv", index=False)
 
@@ -236,7 +300,10 @@ fig.tight_layout()
 fig.savefig(OUTPUT_DIR / "final_top_selected_stocks.png", dpi=160)
 show_or_close(fig)
 
-# 4) Selection stability and turnover together.
+# %% [markdown]
+# ### 4.5 Selection Stability and Turnover
+
+# %%
 selection_stability = selection_overlap["jaccard_vs_previous"].dropna()
 turnover_by_method = full_pipeline.loc[[m for m in METHOD_ORDER if m in full_pipeline.index and m != "benchmark_sp500"], "average_turnover_per_rebalance"]
 
@@ -245,7 +312,7 @@ axes[0].plot(pd.to_datetime(selection_overlap["rebalance_date"]), selection_over
 axes[0].set_ylim(0, 1.05)
 axes[0].set_title("Stock Selection Stability")
 axes[0].set_ylabel("Jaccard Similarity vs Previous Month")
-axes[1].bar([label_method(m) for m in turnover_by_method.index], turnover_by_method.values, color="#E15759")
+axes[1].bar([chart_label_method(m) for m in turnover_by_method.index], turnover_by_method.values, color="#E15759")
 axes[1].set_title("Average Turnover per Rebalance")
 axes[1].tick_params(axis="x", rotation=35)
 fig.tight_layout()
@@ -255,7 +322,10 @@ show_or_close(fig)
 print("Saved final summary charts.")
 
 # %% [markdown]
-# ## Write Final Markdown Report
+# ## 5. Build Final Markdown Report
+
+# %% [markdown]
+# ### 5.1 Build Report Tables
 
 # %%
 data_summary = pd.DataFrame(
@@ -274,10 +344,6 @@ data_summary = pd.DataFrame(
         {"Item": "Missing holding-return audit rows", "Value": f"{len(missing_holding_returns):,}"},
     ]
 )
-
-best_cagr_method = full_pipeline.drop(index=["benchmark_sp500"], errors="ignore")["cagr"].idxmax()
-best_sharpe_method = full_pipeline.drop(index=["benchmark_sp500"], errors="ignore")["sharpe_ratio"].idxmax()
-best_drawdown_method = full_pipeline.drop(index=["benchmark_sp500"], errors="ignore")["max_drawdown"].idxmax()
 
 top_selected_table = top_selection[["ticker", "selected_count", "first_selected_date", "last_selected_date", "average_sharpe", "sector"]].head(15).copy()
 top_selected_table["average_sharpe"] = top_selected_table["average_sharpe"].map(lambda x: num(x, 4))
@@ -298,10 +364,47 @@ leakage_table = leakage_table.rename(
     }
 )
 
-report_lines = [
+# %% [markdown]
+# ### 5.2 Identify Headline Methods
+
+# %%
+strategy_metrics = full_pipeline.drop(index=["benchmark_sp500"], errors="ignore")
+best_cagr_method = strategy_metrics["cagr"].idxmax()
+best_sharpe_method = strategy_metrics["sharpe_ratio"].idxmax()
+best_drawdown_method = strategy_metrics["max_drawdown"].idxmax()
+
+headline_summary = pd.DataFrame(
+    [
+        {"Metric": "Best full-pipeline CAGR", "Method": label_method(best_cagr_method), "Value": pct(full_pipeline.loc[best_cagr_method, "cagr"])},
+        {"Metric": "Best full-pipeline Sharpe", "Method": label_method(best_sharpe_method), "Value": num(full_pipeline.loc[best_sharpe_method, "sharpe_ratio"], 4)},
+        {"Metric": "Shallowest full-pipeline max drawdown", "Method": label_method(best_drawdown_method), "Value": pct(full_pipeline.loc[best_drawdown_method, "max_drawdown"])},
+    ]
+)
+
+try:
+    display(headline_summary)
+except NameError:
+    print(headline_summary)
+
+# %% [markdown]
+# ### 5.3 Build Executive and Results Sections
+
+# %%
+workflow_summary_table = pd.DataFrame(
+    [
+        {"Step": "01", "File": "notebooks/01_prepare_sp500_data.ipynb", "Purpose": "Prepare S&P 500 universe, prices, returns, benchmark, and quality reports"},
+        {"Step": "02", "File": "notebooks/02_select_stocks_clustering_mst.ipynb", "Purpose": "Cluster stocks and select one stock per cluster using historical Sharpe as a backward-looking ranking heuristic"},
+        {"Step": "03", "File": "notebooks/03_allocate_portfolios.ipynb", "Purpose": "Create current portfolio allocations using Equal Weight, Inverse Volatility, Markowitz-style Mean-Volatility Optimization, Risk Parity, CVaR Bootstrap, and CVaR Monte Carlo"},
+        {"Step": "04", "File": "notebooks/04_backtest_allocation_only.ipynb", "Purpose": "Allocation-only walk-forward test using the fixed Step 02 selected-stock list"},
+        {"Step": "05", "File": "notebooks/05_backtest_full_pipeline_walkforward.ipynb", "Purpose": "Main full-pipeline walk-forward simulation with stock selection and allocation rerun each rebalance"},
+        {"Step": "06", "File": "notebooks/06_final_summary_report.ipynb", "Purpose": "Final project summary and comparison report"},
+    ]
+)
+
+executive_and_results_lines = [
     "# Final Project Summary",
     "",
-    f"Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}",
+    f"Generated: {REPORT_GENERATED_AT}",
     "",
     "## Executive Summary",
     "",
@@ -323,18 +426,7 @@ report_lines = [
     "",
     "## Workflow Summary",
     "",
-    markdown_table(
-        pd.DataFrame(
-            [
-                {"Step": "01", "File": "notebooks/01_prepare_sp500_data.ipynb", "Purpose": "Prepare S&P 500 universe, prices, returns, benchmark, and quality reports"},
-                {"Step": "02", "File": "notebooks/02_select_stocks_clustering_mst.ipynb", "Purpose": "Cluster stocks and select one stock per cluster using historical Sharpe as a backward-looking ranking heuristic"},
-                {"Step": "03", "File": "notebooks/03_allocate_portfolios.ipynb", "Purpose": "Create current portfolio allocations using Equal Weight, Inverse Volatility, Markowitz-style Mean-Volatility Optimization, Risk Parity, CVaR Bootstrap, and CVaR Monte Carlo"},
-                {"Step": "04", "File": "notebooks/04_backtest_allocation_only.ipynb", "Purpose": "Allocation-only walk-forward test using the fixed Step 02 selected-stock list"},
-                {"Step": "05", "File": "notebooks/05_backtest_full_pipeline_walkforward.ipynb", "Purpose": "Main full-pipeline walk-forward simulation with stock selection and allocation rerun each rebalance"},
-                {"Step": "06", "File": "notebooks/06_final_summary_report.ipynb", "Purpose": "Final project summary and comparison report"},
-            ]
-        )
-    ),
+    markdown_table(workflow_summary_table),
     "",
     "## Step 05 Full-Pipeline Results",
     "",
@@ -368,6 +460,14 @@ report_lines = [
     "",
     markdown_table(latest_selected_table),
     "",
+
+]
+
+# %% [markdown]
+# ### 5.4 Build Interpretation and Limitation Sections
+
+# %%
+interpretation_and_limitations_lines = [
     "## Final Interpretation",
     "",
     "- Use **Step 05** as the main historical evaluation of the workflow.",
@@ -428,6 +528,14 @@ report_lines = [
     "- Best CAGR, best Sharpe, and lowest drawdown can point to different models. The final choice depends on the investor's objective.",
     "- Current results are research evidence, not a live trading recommendation.",
     "",
+
+]
+
+# %% [markdown]
+# ### 5.5 Build Improvement and Output Sections
+
+# %%
+improvement_and_output_lines = [
     "## Recommended Improvements",
     "",
     "1. Add point-in-time S&P 500 constituent history.",
@@ -453,10 +561,23 @@ report_lines = [
     "",
 ]
 
+report_lines = executive_and_results_lines + interpretation_and_limitations_lines + improvement_and_output_lines
+
+# %% [markdown]
+# ### 5.6 Write Report and Summary Tables
+
+# %%
 report_path = DOCS_DIR / "final_summary_report.md"
 report_path.write_text("\n".join(report_lines), encoding="utf-8")
 
 # Also save the key tables as CSV files for easy reuse.
+final_summary_table_files = [
+    "final_data_summary.csv",
+    "final_full_pipeline_metrics_table.csv",
+    "final_allocation_only_metrics_table.csv",
+    "final_04_vs_05_cagr_table.csv",
+]
+
 data_summary.to_csv(OUTPUT_DIR / "final_data_summary.csv", index=False)
 full_pipeline_table.to_csv(OUTPUT_DIR / "final_full_pipeline_metrics_table.csv", index=False)
 allocation_backtest_table.to_csv(OUTPUT_DIR / "final_allocation_only_metrics_table.csv", index=False)
@@ -466,7 +587,49 @@ print("Saved final markdown report:", report_path)
 print("Saved final summary tables and charts to:", OUTPUT_DIR)
 
 # %% [markdown]
-# ## Final Recommendation
+# ## 6. Output Manifest
+
+# %%
+final_chart_output_files = [
+    "final_full_pipeline_scorecard.png",
+    "final_04_vs_05_comparison.csv",
+    "final_04_vs_05_cagr_comparison.png",
+    "final_top_selected_stocks.csv",
+    "final_top_selected_stocks.png",
+    "final_selection_stability_and_turnover.png",
+]
+
+final_report_output_files = [
+    report_path.relative_to(PROJECT_ROOT).as_posix(),
+    *[f"outputs/{file}" for file in final_summary_table_files],
+    *[f"outputs/{file}" for file in final_chart_output_files],
+]
+
+final_output_manifest = pd.DataFrame(
+    {
+        "file": final_report_output_files,
+        "exists": [(PROJECT_ROOT / file).exists() for file in final_report_output_files],
+        "size_bytes": [
+            (PROJECT_ROOT / file).stat().st_size if (PROJECT_ROOT / file).exists() else np.nan
+            for file in final_report_output_files
+        ],
+    }
+)
+final_output_manifest.to_csv(OUTPUT_DIR / "final_output_manifest.csv", index=False)
+
+try:
+    display(final_output_manifest)
+except NameError:
+    print(final_output_manifest)
+
+missing_final_outputs = final_output_manifest.loc[~final_output_manifest["exists"], "file"].tolist()
+if missing_final_outputs:
+    print("Missing expected final outputs:", missing_final_outputs)
+else:
+    print(f"All {len(final_output_manifest)} expected final outputs are present.")
+
+# %% [markdown]
+# ## 7. Interpretation Note
 #
 # Use Step 05 as the main evidence for the project. Treat Step 04 as a diagnostic that explains how allocation
 # methods behave after the stock list is already known, not as a leakage-free historical strategy result.
