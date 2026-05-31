@@ -30,11 +30,11 @@ This file records where each part of the S&P 500 stock-selection and portfolio-a
 
 | Source | Used For | Link |
 |---|---|---|
-| `investment-funnel` by VanekPetr | Overall idea of investment funnel workflow: feature selection, scenario generation, Markowitz/CVaR optimization, and backtesting separation | https://github.com/VanekPetr/investment-funnel |
+| `investment-funnel` by VanekPetr | High-level inspiration for the first part of the workflow: feature selection, scenario generation, and Markowitz/CVaR-style optimization | https://github.com/VanekPetr/investment-funnel |
 
 Also inspected a local clone of `investment-funnel` and the `ifunnel==0.0.6` package source during development to compare the model structure.
 
-Important adaptation: the original repo works with ETFs/funds. This project adapts the idea to individual S&P 500 stocks.
+Important adaptation: the original repo works with ETFs/funds. This project adapts the early workflow idea to individual S&P 500 stocks. The walk-forward backtests in Steps 04-05 and the final report generation in Step 06 are project-specific implementations, not copied from the source repository.
 
 This project uses the current S&P 500 constituent universe as the stock universe. Therefore, the results should be interpreted as a current-constituent walk-forward simulation, not as a fully point-in-time historical S&P 500 backtest.
 
@@ -54,7 +54,7 @@ This project uses the current S&P 500 constituent universe as the stock universe
 
 | Item | Source Idea | Our Adaptation |
 |---|---|---|
-| Investment funnel structure | Separate universe preparation, feature selection, optimization, and backtest/evaluation | `notebooks/01` through `notebooks/06` |
+| Investment funnel structure | Separate data preparation, feature selection, and portfolio optimization stages | Adapted only for `notebooks/01` through `notebooks/03`; Steps 04-06 are project-specific backtest and reporting work |
 | Hierarchical clustering | Use correlation structure to group similar assets | Use Spearman correlation for S&P 500 stocks and select one stock per cluster |
 | MST | Used in the repo as a graph-based feature-selection method | Used here only as a relationship visualization, not the primary stock selector |
 | Scenario generation | Bootstrap and Monte Carlo scenarios for CVaR | Generate scenarios only for CVaR optimization |
@@ -92,7 +92,7 @@ These values are not fixed by MOSEK, Wikipedia, FRED, Yahoo Finance, or the orig
 
 ### Step 04 Allocation-Only Setup
 
-Step 04 is an allocation-only walk-forward backtest inspired by the original repo's custom `algo.backtest()` flow.
+Step 04 is an allocation-only walk-forward backtest implemented for this project. It uses the fixed Step 02 stock list to evaluate allocation methods, and it is not copied from the source repository.
 
 | Item | Current Setting | Notes |
 |---|---:|---|
