@@ -30,17 +30,17 @@ This file records where each part of the S&P 500 stock-selection and portfolio-a
 
 | Source | Used For | Link |
 |---|---|---|
-| `investment-funnel` by VanekPetr | High-level inspiration for the first part of the workflow: feature selection, scenario generation, and Markowitz/CVaR-style optimization | https://github.com/VanekPetr/investment-funnel |
+| `investment-funnel` by VanekPetr | High-level inspiration for Step 02 stock selection and Step 03 portfolio allocation: correlation-based feature selection, scenario generation, and Markowitz/CVaR-style optimization | https://github.com/VanekPetr/investment-funnel |
 
 Also inspected a local clone of `investment-funnel` and the `ifunnel==0.0.6` package source during development to compare the model structure.
 
-Important adaptation: the original repo works with ETFs/funds. This project adapts the early workflow idea to individual S&P 500 stocks. The walk-forward backtests in Steps 04-05 and the final report generation in Step 06 are project-specific implementations, not copied from the source repository.
+Important adaptation: the original repo works with ETFs/funds. In this project, the reference is used only for the Step 02 stock-selection idea and the Step 03 portfolio-allocation idea, which are adapted to individual S&P 500 stocks.
 
 This project uses the current S&P 500 constituent universe as the stock universe. Therefore, the results should be interpreted as a current-constituent walk-forward simulation, not as a fully point-in-time historical S&P 500 backtest.
 
 ## Portfolio Model References
 
-| Model / Concept | What We Took | Our Implementation | Reference |
+| Model / Concept | Reference Concept | Our Implementation | Reference |
 |---|---|---|---|
 | Markowitz-style Mean-Volatility Optimization | Efficient-frontier idea and mean-risk tradeoff | Maximize `annual_return - delta * annual_volatility`; Step 03 uses a 25-point dense frontier for presentation, while Steps 04-05 use a 10-point grid for walk-forward runtime | https://docs.mosek.com/portfolio-cookbook/markowitz.html |
 | Markowitz constraints | Budget and long-only style constraints, plus diversification limits | Sum weights = 1, long-only, max 10% per stock | https://docs.mosek.com/portfolio-cookbook/markowitz.html |
@@ -50,11 +50,11 @@ This project uses the current S&P 500 constituent universe as the stock universe
 | Bootstrap scenarios | Resampling observations with replacement | Sample whole historical daily-return rows to preserve cross-asset co-movement | https://en.wikipedia.org/wiki/Bootstrapping_(statistics) |
 | Monte Carlo scenarios | Random simulation from an assumed distribution | Sample daily stock-return vectors from multivariate normal fitted to historical mean/covariance | https://en.wikipedia.org/wiki/Monte_Carlo_method |
 
-## What Came From `investment-funnel`
+## How `investment-funnel` Is Used
 
-| Item | Source Idea | Our Adaptation |
+| Item | Reference Idea | Project Use |
 |---|---|---|
-| Investment funnel structure | Separate data preparation, feature selection, and portfolio optimization stages | Adapted only for `notebooks/01` through `notebooks/03`; Steps 04-06 are project-specific backtest and reporting work |
+| Investment funnel structure | Feature selection and portfolio optimization stages | Used only for `notebooks/02` and `notebooks/03` |
 | Hierarchical clustering | Use correlation structure to group similar assets | Use Spearman correlation for S&P 500 stocks and select one stock per cluster |
 | MST | Used in the repo as a graph-based feature-selection method | Used here only as a relationship visualization, not the primary stock selector |
 | Scenario generation | Bootstrap and Monte Carlo scenarios for CVaR | Generate scenarios only for CVaR optimization |
@@ -92,7 +92,7 @@ These values are not fixed by MOSEK, Wikipedia, FRED, Yahoo Finance, or the orig
 
 ### Step 04 Allocation-Only Setup
 
-Step 04 is an allocation-only walk-forward backtest implemented for this project. It uses the fixed Step 02 stock list to evaluate allocation methods, and it is not copied from the source repository.
+Step 04 is an allocation-only walk-forward backtest implemented for this project. It uses the fixed Step 02 stock list to evaluate allocation methods.
 
 | Item | Current Setting | Notes |
 |---|---:|---|
@@ -124,82 +124,3 @@ Step 04 is an allocation-only walk-forward backtest implemented for this project
 | Allocation models | Six allocation methods | Recomputed at every rebalance using the selected stocks and past data only |
 | Transaction cost | `0.001` | Simple proportional turnover cost |
 | Risk-free rate | Historical FRED `DGS3MO`, with saved Step 03 fallback | Used for training Sharpe, portfolio training metrics, and realized Sharpe calculations |
-
-## Current Output Interpretation
-
-| Output | Meaning |
-|---|---|
-| `outputs/selected_stocks.csv` | Final 25 selected stocks after clustering and excess-Sharpe selection |
-| `outputs/stock_selection_risk_free_rate.csv` | Risk-free rate used in Step 2 Sharpe selection |
-| `outputs/risk_free_rate.csv` | Risk-free rate used in Step 3 portfolio metrics |
-| `outputs/portfolio_markowitz_frontier_summary.csv` | Main Step 03 Markowitz-style Mean-Volatility Optimization result: 25 delta points on the current-allocation frontier |
-| `outputs/portfolio_weights_markowitz_best_sharpe_default.csv` | Representative Markowitz-style point used in the headline comparison |
-| `outputs/portfolio_cvar_frontier_summary.csv` | Step 03 CVaR frontier points for Bootstrap and Monte Carlo scenarios, including scenario type, risk metric, horizon, and portfolio type metadata |
-| `outputs/portfolio_allocation_summary.csv` | Headline comparison across portfolio allocation methods |
-| `outputs/portfolio_allocation_risk_return_scatter.png` | Step 3 risk-return view of the allocation methods |
-| `outputs/portfolio_allocation_metric_bars.png` | Step 3 metric dashboard: return, volatility, Sharpe, and CVaR |
-| `outputs/portfolio_top10_weights_by_method.png` | Step 3 top holdings for each allocation method |
-| `outputs/portfolio_risk_contribution_heatmap.png` | Step 3 signed risk contribution by ticker and method |
-| `outputs/portfolio_absolute_risk_contribution_heatmap.png` | Step 3 absolute normalized risk contribution by ticker and method |
-| `outputs/portfolio_mean_cvar_frontier.png` | Step 3 direct Mean-CVaR frontier with scenario CVaR on the x-axis |
-| `outputs/portfolio_cvar_scenario_return_distributions.png` | Step 3 Bootstrap vs Monte Carlo scenario distributions for CVaR portfolios |
-| `outputs/backtest_metrics.csv` | Out-of-sample performance metrics for each allocation method and benchmark |
-| `outputs/backtest_equity_curves.csv` | Growth of 1.0 through the backtest period |
-| `outputs/backtest_daily_returns.csv` | Net daily portfolio returns after transaction cost |
-| `outputs/backtest_weights_history.csv` | Target weights at each rebalance date |
-| `outputs/backtest_turnover.csv` | Turnover and transaction-cost records for each rebalance |
-| `outputs/backtest_risk_return_scatter.png` | Step 4 realized risk-return view from the backtest |
-| `outputs/backtest_metric_dashboard.png` | Step 4 final-value, CAGR, Sharpe, and drawdown dashboard |
-| `outputs/backtest_relative_wealth_vs_benchmark.png` | Step 4 portfolio value divided by S&P 500 benchmark value |
-| `outputs/backtest_calendar_year_returns.png` | Step 4 calendar-year returns by method |
-| `outputs/backtest_rolling_252d_return.png` | Step 4 rolling one-year return |
-| `outputs/backtest_rolling_252d_sharpe.png` | Step 4 rolling one-year Sharpe ratio |
-| `outputs/full_pipeline_metrics.csv` | Step 5 full-pipeline walk-forward performance metrics |
-| `outputs/full_pipeline_selected_stocks_history.csv` | Step 5 selected stocks at every rebalance date, including `train_start_date`, `train_end_date`, and `selection_mode` audit columns |
-| `outputs/full_pipeline_selection_frequency.csv` | Step 5 frequency of each stock being selected across rebalance dates |
-| `outputs/full_pipeline_selected_overlap.csv` | Step 5 month-to-month selection stability |
-| `outputs/full_pipeline_weights_history.csv` | Step 5 allocation weights after dynamic stock selection |
-| `outputs/full_pipeline_turnover.csv` | Step 5 turnover and transaction-cost records for each rebalance |
-| `outputs/full_pipeline_equity_curves.png` | Step 5 growth of 1.0 for the full pipeline |
-| `outputs/full_pipeline_relative_wealth_vs_benchmark.png` | Step 5 portfolio value divided by S&P 500 benchmark value |
-| `outputs/full_pipeline_risk_return_scatter.png` | Step 5 realized risk-return comparison across allocation methods and benchmark |
-| `outputs/full_pipeline_metric_dashboard.png` | Step 5 final-value, CAGR, Sharpe, and drawdown dashboard |
-| `outputs/full_pipeline_calendar_year_return_details.csv` | Step 5 year-by-year period start/end markers, including whether the latest year is YTD/partial |
-| `outputs/full_pipeline_selected_stock_frequency.png` | Step 5 most frequently selected stocks |
-| `outputs/full_pipeline_selection_stability.png` | Step 5 stability of the selected 25-stock set over time |
-| `outputs/full_pipeline_missing_holding_returns.csv` | Step 5 audit table for missing realized holding-period returns; latest run has zero rows |
-| `docs/final_summary_report.md` | Step 6 generated final narrative report |
-| `outputs/final_data_summary.csv` | Step 6 compact data summary table |
-| `outputs/final_full_pipeline_metrics_table.csv` | Step 6 formatted full-pipeline metrics table |
-| `outputs/final_04_vs_05_cagr_table.csv` | Step 6 formatted allocation-only vs full-pipeline CAGR comparison |
-| `outputs/final_output_manifest.csv` | Step 6 manifest checking that final report tables and charts exist |
-
-## Important Limitations
-
-1. The S&P 500 universe comes from the current Wikipedia page, so historical backtests using this universe may have survivorship/constituent bias. Results should be described as a current-constituent walk-forward simulation, not as a fully point-in-time historical S&P 500 backtest.
-2. Yahoo Finance data availability and ticker mapping can change over time.
-3. Missing return handling can affect results, especially for delisted, suspended, or sparsely traded securities. Any fill rules should be interpreted as simplifying data assumptions rather than true tradable outcomes.
-4. When realized holding-period returns are missing, the current full-pipeline implementation may fill missing values with `0.0`. This is a simplifying assumption and may understate losses or distort performance for delisted or suspended securities.
-5. For a stricter no-lookahead implementation, the risk-free rate series should be lagged by one business day because some macro or rate data may not be available before portfolio decisions are made.
-6. The benchmark uses `^GSPC`, which is a price index and may not include reinvested dividends. Since stock returns are calculated from adjusted close prices, benchmark comparisons may not be fully total-return equivalent.
-7. The within-cluster stock selection uses historical Sharpe ratio as a backward-looking ranking heuristic, not as a predictive model of future returns. High past Sharpe may not persist out of sample.
-8. The clustering distance uses 1 minus Spearman correlation as a practical similarity-to-distance transformation. Alternative correlation-distance definitions such as `sqrt(2*(1-rho))` could be tested in future robustness checks.
-9. The number of clusters is fixed at 25 as a design choice. Different cluster counts may lead to different diversification and performance results.
-10. Markowitz-style expected returns are estimated from historical returns and can be noisy.
-11. The Markowitz-style allocation selects optimization settings using in-sample training data at each rebalance. This does not create direct look-ahead bias, but it may overfit the training window. A stricter design would use nested walk-forward validation.
-12. Monte Carlo CVaR scenarios assume multivariate normal returns, which may understate fat tails, skewness, and regime shifts. Bootstrap CVaR is less parametric because it samples from historical return observations.
-13. Bootstrap scenarios preserve same-day cross-asset co-movement but do not preserve serial dependence unless block bootstrap is added later.
-14. The strategy does not explicitly constrain sector exposure. Selected stocks may create unintended sector tilts relative to the S&P 500 benchmark.
-15. The 10% max-weight cap is a risk-control assumption, not a requirement from MOSEK or the original repo.
-16. Step 5 removes look-ahead leakage from stock selection by reselecting stocks at every rebalance with past data only, but it still does not solve point-in-time S&P 500 membership bias.
-17. Even without direct future-return leakage, repeated experimentation with model design, parameters, and reporting choices can create research overfitting. Results should be interpreted as research findings rather than confirmed trading edge.
-
-## Recommended Robustness Checks
-
-Future work should:
-
-1. Add point-in-time S&P 500 constituent history.
-2. Test cluster-count sensitivity across multiple cluster counts such as 15, 20, 25, and 30.
-3. Compare portfolio sector exposures against the S&P 500 to determine whether performance comes from stock selection, diversification, or unintended sector tilts.
-4. Test alternative correlation-distance definitions, including `sqrt(2*(1-rho))`.
-5. Add nested walk-forward validation for `N_CLUSTERS`, `MAX_WEIGHT`, Markowitz-style delta, and CVaR return tradeoff.

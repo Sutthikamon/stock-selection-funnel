@@ -16,11 +16,11 @@ Project files checked:
 
 ## Executive Summary
 
-The `notebooks/04_backtest_allocation_only.ipynb` / `scripts/04_backtest_allocation_only.py` files are valid as an allocation-only walk-forward test, because each rebalance computes portfolio weights using only returns available up to that rebalance date.
+This audit focuses only on data leakage and cross-validation design. It separates allocation-only validity, full-pipeline validity, and the remaining current-constituent universe limitation.
 
-The `notebooks/05_backtest_full_pipeline_walkforward.ipynb` / `scripts/05_backtest_full_pipeline_walkforward.py` files reduce the major step-02 look-ahead problem by re-running clustering and stock selection at every rebalance date using only returns available up to that date.
-
-The remaining major limitation is constituent bias: the investable universe still comes from the current S&P 500 list in the project data, not a point-in-time historical S&P 500 membership dataset. Results should be described as a current-constituent walk-forward simulation, not as a fully point-in-time historical S&P 500 backtest.
+- Step 04 is valid for comparing allocation methods on the fixed Step 02 stock list, because each rebalance fits weights using only returns available up to that rebalance date.
+- Step 05 is the stronger full-workflow backtest because it re-runs clustering, stock selection, and allocation at every rebalance using only past data.
+- The remaining high-risk limitation is that the investable universe still uses current S&P 500 constituents rather than point-in-time historical membership.
 
 ## Leakage Checklist
 
@@ -165,36 +165,3 @@ Current Step 05 behavior:
 - Writes `train_start_date`, `train_end_date`, and `selection_mode = walk_forward_past_data_only` into `full_pipeline_selected_stocks_history.csv`
 - Writes `full_pipeline_missing_holding_returns.csv` as a missing realized holding-period return audit file
 - Uses current S&P 500 constituents from Step 01, not point-in-time constituents
-
-Step 05 output interpretation:
-
-- `full_pipeline_metrics.csv` answers how the dynamic full workflow performed.
-- `full_pipeline_selected_stocks_history.csv` shows which stocks were selected at each rebalance and includes the training window and selection mode for auditability.
-- `full_pipeline_missing_holding_returns.csv` records any missing realized holding-period returns; the latest run has zero rows.
-- `full_pipeline_selection_frequency.csv` shows which stocks were repeatedly selected.
-- `full_pipeline_selected_overlap.csv` shows selection stability over time.
-
-## Recommended Next Fix
-
-If higher historical rigor is required, add point-in-time S&P 500 membership data:
-
-```text
-historical_sp500_constituents_by_date
-```
-
-Purpose:
-
-- At each rebalance, include only stocks that were actually S&P 500 constituents at that date.
-- Avoid current-constituent survivorship/constituent bias.
-
-If point-in-time S&P 500 constituent data is unavailable, label the result clearly as:
-
-```text
-current-constituent historical backtest
-```
-
-not:
-
-```text
-true historical S&P 500 constituent backtest
-```

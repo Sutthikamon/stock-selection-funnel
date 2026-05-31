@@ -1,7 +1,5 @@
 # Final Project Summary
 
-Generated: 2026-05-31 01:04:40
-
 ## Executive Summary
 
 This project builds a stock-selection and portfolio-allocation workflow for S&P 500 stocks. The most reliable result is Step 05, because it re-selects stocks and re-allocates the portfolio at each rebalance date using only past data.
@@ -54,15 +52,13 @@ Important limitation: Step 05 fixes the major look-ahead issue from using one fi
 | CVaR Monte Carlo                             | 1.5025      | 9.87%  | 0.4644 | -23.67%      | 13.60%     | 32.20    |
 | S&P 500                                      | 1.5231      | 10.22% | 0.4127 | -25.43%      | 17.55%     | 0.00     |
 
-## Step 05 Audit Outputs
+## Step 05 Audit Trail
 
-Step 05 exports `outputs/full_pipeline_selected_stocks_history.csv` with audit metadata for every selected-stock record:
+Step 05 records each rebalance's selected stocks in `outputs/full_pipeline_selected_stocks_history.csv`, including the training window (`train_start_date` to `train_end_date`) and `selection_mode = walk_forward_past_data_only`.
 
-- `train_start_date`: first return date available in the expanding training window
-- `train_end_date`: rebalance date used as the final training date
-- `selection_mode`: `walk_forward_past_data_only`
+The missing holding-return audit is saved in `outputs/full_pipeline_missing_holding_returns.csv`; the latest run has 0 missing-return audit rows.
 
-This metadata makes the selected-stock history easier to audit because each record states the data window used for selection. Step 05 also exports `outputs/full_pipeline_missing_holding_returns.csv` to audit missing realized holding-period returns. The latest run has 0 missing-return audit rows.
+These outputs support the claim that Step 05 reselects stocks using only past data at each rebalance, although the universe still uses current S&P 500 constituents rather than point-in-time historical membership.
 
 ## Step 04 vs Step 05: Leakage Impact
 
@@ -100,35 +96,9 @@ Step 04 used the fixed 25 stocks selected with full-history information. Step 05
 
 ## Latest Full-History Selected Stocks from Step 02
 
-These are useful for the current allocation view, but should not be treated as a leakage-free historical stock list.
+The static Step 02 selected-stock list is useful for the current allocation view, but it should not be treated as a leakage-free historical stock list because it uses full-history information.
 
-| ticker | cluster_id | sector                 | annual_return | annual_volatility | sharpe_ratio |
-| ------ | ---------- | ---------------------- | ------------- | ----------------- | ------------ |
-| PM     | 1          | Consumer Staples       | 19.11%        | 25.40%            | 0.6075       |
-| TGT    | 2          | Consumer Staples       | 12.67%        | 35.06%            | 0.2563       |
-| COST   | 3          | Consumer Staples       | 26.37%        | 22.67%            | 1.0006       |
-| KR     | 4          | Consumer Staples       | 15.78%        | 28.06%            | 0.4311       |
-| IRM    | 5          | Real Estate            | 26.94%        | 31.83%            | 0.7308       |
-| MCD    | 6          | Consumer Discretionary | 9.75%         | 21.55%            | 0.2818       |
-| TMUS   | 7          | Communication Services | 16.88%        | 26.67%            | 0.4951       |
-| CBOE   | 8          | Financials             | 19.60%        | 26.27%            | 0.6059       |
-| PGR    | 9          | Financials             | 22.15%        | 26.17%            | 0.7059       |
-| STX    | 10         | Information Technology | 54.50%        | 42.60%            | 1.1930       |
-| NEM    | 11         | Materials              | 20.89%        | 36.89%            | 0.4665       |
-| NVDA   | 12         | Information Technology | 74.73%        | 50.96%            | 1.3941       |
-| VRT    | 13         | Industrials            | 62.01%        | 56.07%            | 1.0403       |
-| TKO    | 14         | Communication Services | 14.96%        | 37.28%            | 0.3026       |
-| SW     | 15         | Materials              | 9.91%         | 45.93%            | 0.1357       |
-| PWR    | 16         | Industrials            | 55.05%        | 36.19%            | 1.4194       |
-| HWM    | 17         | Industrials            | 47.56%        | 40.50%            | 1.0833       |
-| MRNA   | 18         | Health Care            | 15.73%        | 72.01%            | 0.1673       |
-| AAPL   | 19         | Information Technology | 31.89%        | 30.85%            | 0.9145       |
-| EA     | 20         | Communication Services | 13.90%        | 28.15%            | 0.3630       |
-| STLD   | 21         | Materials              | 34.42%        | 41.68%            | 0.7376       |
-| MCK    | 22         | Health Care            | 32.05%        | 28.54%            | 0.9942       |
-| LLY    | 23         | Health Care            | 35.87%        | 32.98%            | 0.9760       |
-| MSI    | 24         | Information Technology | 21.67%        | 26.67%            | 0.6746       |
-| HCA    | 25         | Health Care            | 20.20%        | 35.17%            | 0.4698       |
+The full table is available in `outputs/selected_stocks.csv`; Step 05 should be used for the main historical evaluation.
 
 ## Final Interpretation
 
@@ -141,53 +111,17 @@ These are useful for the current allocation view, but should not be treated as a
 
 ## Limitations And Known Weaknesses
 
-### Data Limitations
-
-- The S&P 500 universe is based on the current Wikipedia constituent list, not point-in-time historical membership. This can create survivorship and constituent bias. The results should be interpreted as a current-constituent walk-forward simulation, not as a fully point-in-time historical S&P 500 backtest.
-- Yahoo Finance data can contain revisions, ticker mapping changes, missing fields, delisting gaps, or adjusted-price methodology changes.
-- Missing return handling can affect results, especially for delisted, suspended, or sparsely traded securities. Any fill rules should be interpreted as simplifying data assumptions rather than true tradable outcomes.
-- When realized holding-period returns are missing, the current full-pipeline implementation may fill missing values with `0.0`. This is a simplifying assumption and may understate losses or distort performance for delisted or suspended securities.
-- The benchmark uses `^GSPC`, which is a price index and may not include reinvested dividends. Since stock returns are calculated from adjusted close prices, benchmark comparisons may not be fully total-return equivalent.
-- For a stricter no-lookahead implementation, the risk-free rate series should be lagged by one business day because some macro or rate data may not be available before portfolio decisions are made.
-- The backtest period starts holding on 2022-01-03 and ends on 2026-05-01, so the test covers only about 4.3 years of realized holding history.
-- The 2026 calendar-year result is YTD only, not a full-year result.
-
-### Methodology Limitations
-
-- Step 04 is intentionally allocation-only and uses the fixed 25 stocks from Step 02; it should not be used as the main historical strategy result.
-- Step 05 fixes the fixed-stock look-ahead issue by reselecting each rebalance and records `train_start_date`, `train_end_date`, and `selection_mode` in the selected-stock history, but it still does not fix point-in-time S&P 500 membership bias.
-- The within-cluster stock selection uses historical Sharpe ratio as a backward-looking ranking heuristic, not as a predictive model of future returns. High past Sharpe may not persist out of sample.
-- The clustering distance uses 1 minus Spearman correlation as a practical similarity-to-distance transformation. Alternative correlation-distance definitions such as `sqrt(2*(1-rho))` could be tested in future robustness checks.
-- The number of clusters is fixed at 25 as a design choice. Different cluster counts may lead to different diversification and performance results. Future work should test sensitivity across multiple cluster counts such as 15, 20, 25, and 30.
-- Transaction cost is modeled as a simple proportional turnover cost of 0.001. It does not include bid-ask spread, market impact, tax, liquidity, borrow constraints, or execution slippage.
-- Rebalancing is monthly. Results may change materially with weekly, quarterly, or threshold-based rebalancing.
-- The strategy assumes fractional shares and immediate execution at return-series prices.
-
-### Model Limitations
-
-- The Markowitz implementation is Markowitz-style mean-risk optimization using volatility as the risk penalty, rather than the classic mean-variance objective using variance directly.
-- Markowitz-style Mean-Volatility Optimization depends heavily on historical expected-return estimates, which are noisy and unstable for equities.
-- The Markowitz-style allocation selects optimization settings using in-sample training data at each rebalance. This does not create direct look-ahead bias, but it may overfit the training window. A stricter design would use nested walk-forward validation.
-- CVaR Bootstrap depends on historical sampled days and may miss unseen future regimes.
-- The Monte Carlo CVaR method depends on a multivariate normal return assumption. Because equity returns can exhibit fat tails, skewness, and regime shifts, this assumption may underestimate tail risk. The bootstrap CVaR method is less parametric because it samples from historical return observations.
-- Risk Parity and Inverse Volatility reduce risk exposure but do not directly forecast future returns.
-- The strategy does not explicitly constrain sector exposure. Selected stocks may create unintended sector tilts relative to the S&P 500 benchmark.
-- The 10% max-weight cap is a project risk-control assumption, not a universal optimal setting.
-
-### Validation Limitations
-
-- Hyperparameters such as `N_CLUSTERS`, `MAX_WEIGHT`, Markowitz-style delta grid, CVaR tradeoff, and scenario count are not selected through nested walk-forward validation.
-- The same broad research period influenced model design choices, so there is still research/iteration overfitting risk.
-- Even without direct future-return leakage, repeated experimentation with model design, parameters, and reporting choices can create research overfitting. Results should be interpreted as research findings rather than confirmed trading edge.
-- Statistical significance is not tested. Differences such as 12.70% vs 12.63% CAGR should not be treated as conclusive without robustness checks.
-- No stress test by market regime, sector exposure, liquidity bucket, or alternative start date is included yet.
-
-### Interpretation Warnings
-
-- A positive Sharpe ratio means return exceeded the risk-free rate per unit volatility; it does not necessarily mean the model beat the S&P 500 benchmark.
-- Historical Sharpe ranking is backward-looking and should not be interpreted as a direct prediction of future winners.
-- Best CAGR, best Sharpe, and lowest drawdown can point to different models. The final choice depends on the investor's objective.
-- Current results are research evidence, not a live trading recommendation.
+- The S&P 500 universe uses the current Wikipedia constituent list rather than point-in-time historical membership, so results can contain survivorship/current-constituent bias.
+- Yahoo Finance data can contain missing values, ticker mapping changes, revisions, or adjusted-price methodology differences.
+- The benchmark uses `^GSPC`, a price index, while stock returns use adjusted close prices, so the benchmark comparison is not fully total-return equivalent.
+- Step 04 is allocation-only and uses the fixed Step 02 stock list selected with full-history data; it should not be treated as the main strategy backtest.
+- Step 05 reselects stocks and reallocates monthly using only past returns, but it still does not solve point-in-time S&P 500 membership bias.
+- Historical Sharpe ranking is backward-looking and should not be interpreted as a direct forecast of future winners.
+- Markowitz-style optimization relies on noisy historical expected-return estimates, and its in-sample parameter selection can overfit without nested walk-forward validation.
+- CVaR Bootstrap depends on historical sampled days, while CVaR Monte Carlo assumes multivariate normal returns that may understate fat tails and regime shifts.
+- Transaction cost is modeled as a simple proportional cost of 0.001 per turnover and excludes bid-ask spread, slippage, market impact, taxes, liquidity constraints, and execution frictions.
+- The strategy does not explicitly constrain sector exposure, and statistical significance or regime stress tests have not yet been added.
+- Results are research evidence for this current-constituent simulation, not live investment advice.
 
 ## Recommended Improvements
 
@@ -201,13 +135,16 @@ These are useful for the current allocation view, but should not be treated as a
 8. Test cluster-count sensitivity across multiple cluster counts such as 15, 20, 25, and 30.
 9. Test alternative correlation-distance definitions, including `sqrt(2*(1-rho))`.
 
-## Key Output Charts
+## Key Output Files
 
+- `outputs/final_full_pipeline_metrics_table.csv`
+- `outputs/final_04_vs_05_cagr_table.csv`
+- `outputs/full_pipeline_selected_stocks_history.csv`
+- `outputs/full_pipeline_missing_holding_returns.csv`
+- `outputs/full_pipeline_config.csv`
 - `outputs/final_full_pipeline_scorecard.png`
 - `outputs/final_04_vs_05_cagr_comparison.png`
 - `outputs/final_top_selected_stocks.png`
 - `outputs/final_selection_stability_and_turnover.png`
 - `outputs/full_pipeline_equity_curves.png`
 - `outputs/full_pipeline_relative_wealth_vs_benchmark.png`
-- `outputs/portfolio_mean_cvar_frontier.png`
-- `outputs/portfolio_absolute_risk_contribution_heatmap.png`

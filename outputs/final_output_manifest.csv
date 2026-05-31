@@ -1,5 +1,5 @@
 file,exists,size_bytes
-docs/final_summary_report.md,True,19771
+docs/final_summary_report.md,True,13144
 outputs/final_data_summary.csv,True,440
 outputs/final_full_pipeline_metrics_table.csv,True,493
 outputs/final_allocation_only_metrics_table.csv,True,490
